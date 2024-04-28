@@ -1,31 +1,146 @@
-## Zuggenerator ##
-
-# valid moves red one figure
+##Zuggenerator
+#valid moves red one figure
 move_hv_red = [(1,0), (-1,0), (0,1)]
-# valid moves red two figures
+#valid moves red attack figure
 move_diagonal_red = [(1,1),(-1,1)]
+#valid moves blue two figures
+move_two_fgR = [(1,2),(-1,2),(2,1),(-2,1)]
 
-# valid moves blue one figur
+#valid moves blue one figur
 move_hv_blue = [(1,0), (-1,0), (0,-1)]
-# valid moves blue two figures
+#valid moves blue attack figure
 move_diagonal_blue = [(1,-1),(-1,-1)]
+#valid moves blue two figures
+move_two_fgB = [(1,-2),(-1,-2),(2,-1),(-2,-1)]
 
 
-def board():
-    # initialize empty board
-    gameboard = [
-        [''] * 8 for _ in range(8)
-    ]
+def fen_to_board(fen):
+    # Split FEN string to get board layout and turn information
+    board_str, turn = fen.split(' ')
 
-    # delete corner positions
+    # Initialize empty board without corners
+    gameboard = [[''] * 8 for _ in range(8)]
+
     gameboard[0][0] = None  # a1
     gameboard[0][7] = None  # h1
     gameboard[7][7] = None  # h8
     gameboard[7][0] = None  # a8
 
-    return gameboard
+    # Convert FEN string to board layout
+    row = 0
+    col = 0
+    for char in board_str:
+        if char.isdigit():
+            col += int(char)
+        elif char == '/':
+            row += 1
+            col = 0
+        else:
+            gameboard[row][col] = char
+            col += 1
 
-##TODO##
-# split String into Array
-fen = ''
-split_fen = fen.split('/')[0].split(' ')
+    return gameboard, turn
+
+def print_board(gameboard):
+    for row in gameboard:
+        print(" ".join(str(cell) if cell else '.' for cell in row))
+
+def count_valid_moves(gameboard, color):
+    valid_moves = 0
+
+    # Define moves based on color
+    if color == 'r':
+        move_hv = move_hv_red
+        move_diagonal = move_diagonal_red
+        move_two_fg = move_two_fgR
+    elif color == 'b':
+        move_hv = move_hv_blue
+        move_diagonal = move_diagonal_blue
+        move_two_fg = move_two_fgB
+    else:
+        return 0
+
+    # Loop through the board
+    for row in range(8):
+        for col in range(8):
+            piece = gameboard[row][col]
+            if piece and piece.lower() == color:  # Check if piece exists and matches color
+                if piece.isupper():  # Check if piece is single
+                    # Count horizontal and vertical moves
+                    valid_moves += sum(1 for dr, dc in move_hv if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                else:  # Check if piece is double
+                    # Count knight-like moves
+                    valid_moves += sum(1 for dr, dc in move_two_fg if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                    # Check for diagonal attack moves
+                    for dr, dc in move_diagonal:
+                        if 0 <= row + dr < 8 and 0 <= col + dc < 8 and gameboard[row + dr][col + dc] and gameboard[row + dr][col + dc].lower() != color:
+                            valid_moves += 1
+    return valid_moves
+
+def fen_to_moves(fen_str):
+    # Function to count valid moves for a given color
+    def count_valid_moves(gameboard, color):
+        valid_moves = []
+
+        # Define moves based on color
+        if color == 'r':
+            move_hv = move_hv_red
+            move_diagonal = move_diagonal_red
+            move_two_fg = move_two_fgR
+        elif color == 'b':
+            move_hv = move_hv_blue
+            move_diagonal = move_diagonal_blue
+            move_two_fg = move_two_fgB
+        else:
+            return []
+
+        # Loop through the board
+        for row in range(8):
+            for col in range(8):
+                piece = gameboard[row][col]
+                if piece and piece.lower() == color:  # Check if piece exists and matches color
+                    if piece.isupper():  # Check if piece is single
+                        # Find horizontal and vertical moves
+                        for dr, dc in move_hv:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
+                                valid_moves.append((row, col, new_row, new_col))
+                    else:  # Check if piece is double
+                        # Find knight-like moves
+                        for dr, dc in move_two_fg:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
+                                valid_moves.append((row, col, new_row, new_col))
+                        # Find diagonal attack moves
+                        for dr, dc in move_diagonal:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
+                                valid_moves.append((row, col, new_row, new_col))
+        return valid_moves
+
+    # Parse FEN string
+    gameboard, turn = fen_to_board(fen_str)
+
+    # Count valid moves for both players
+    red_moves = count_valid_moves(gameboard, 'r')
+    blue_moves = count_valid_moves(gameboard, 'b')
+
+    # Format output
+    output = f"{len(red_moves) + len(blue_moves)} Züge: "
+
+    # Append red moves
+    for move in red_moves:
+        output += f"{chr(65 + move[1])}{move[0] + 1}-{chr(65 + move[3])}{move[2] + 1}, "
+
+    # Append blue moves
+    for move in blue_moves:
+        output += f"{chr(65 + move[1])}{move[0] + 1}-{chr(65 + move[3])}{move[2] + 1}, "
+
+    # Remove the last comma and space
+    output = output[:-2]
+
+    return output
+
+# Test function
+fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+print(fen_to_moves(fen_str))

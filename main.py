@@ -19,12 +19,14 @@ def fen_to_board(fen):
     board_str, turn = fen.split(' ')
 
     # Initialize empty board without corners
-    gameboard = [[''] * 8 for _ in range(8)]
-
-    gameboard[0][0] = None  # a1
-    gameboard[0][7] = None  # h1
-    gameboard[7][7] = None  # h8
-    gameboard[7][0] = None  # a8
+    gameboard = [['', '', '', '', '', ''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '', '',''],
+             ['', '', '', '', '', '']]
 
     # Convert FEN string to board layout
     row = 0
@@ -69,13 +71,41 @@ def count_valid_moves(gameboard, color):
                     # Count horizontal and vertical moves
                     valid_moves += sum(1 for dr, dc in move_hv if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
                 else:  # Check if piece is double
-                    # Count knight-like moves
-                    valid_moves += sum(1 for dr, dc in move_two_fg if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
-                    # Check for diagonal attack moves
-                    for dr, dc in move_diagonal:
-                        if 0 <= row + dr < 8 and 0 <= col + dc < 8 and gameboard[row + dr][col + dc] and gameboard[row + dr][col + dc].lower() != color:
-                            valid_moves += 1
+                    # Check if there are two figures on one field
+                    if row < 7 and gameboard[row][col].lower() == gameboard[row+1][col].lower():
+                        # Count knight-like moves
+                        valid_moves += sum(1 for dr, dc in move_two_fg if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                        # Check for diagonal attack moves
+                        for dr, dc in move_diagonal:
+                            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and gameboard[row + dr][col + dc] and gameboard[row + dr][col + dc].lower() != color:
+                                valid_moves += 1
+                    else:
+                        # Count horizontal and vertical moves
+                        valid_moves += sum(1 for dr, dc in move_hv if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+
     return valid_moves
+
+def create_gameboard():
+    gameboard = []
+    for i in range(8):
+        row = []
+        for j in range(8):
+            if (i == 0 or i == 7) and (j == 0 or j == 7):  # Ecken ausschließen
+                row.append(None)
+            elif i == 0 or i == 7 or j == 0 or j == 7:  # Rand setzen
+                row.append('#')
+            else:  # Innenbereich
+                row.append(' ')
+        gameboard.append(row)
+    return gameboard
+
+def print_gameboard(gameboard):
+    for row in gameboard:
+        print(' '.join(row))
+
+    board = create_gameboard()
+    print_gameboard(board)
+
 
 def fen_to_moves(fen_str):
     # Function to count valid moves for a given color
@@ -106,16 +136,25 @@ def fen_to_moves(fen_str):
                             if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
                                 valid_moves.append((row, col, new_row, new_col))
                     else:  # Check if piece is double
-                        # Find knight-like moves
-                        for dr, dc in move_two_fg:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
-                                valid_moves.append((row, col, new_row, new_col))
-                        # Find diagonal attack moves
-                        for dr, dc in move_diagonal:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
-                                valid_moves.append((row, col, new_row, new_col))
+                        # Check if there are two figures on one field
+                        if row < 7 and gameboard[row][col].lower() == gameboard[row+1][col].lower():
+                            # Find knight-like moves
+                            for dr, dc in move_two_fg:
+                                new_row, new_col = row + dr, col + dc
+                                if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
+                                    valid_moves.append((row, col, new_row, new_col))
+                            # Find diagonal attack moves
+                            for dr, dc in move_diagonal:
+                                new_row, new_col = row + dr, col + dc
+                                if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
+                                    valid_moves.append((row, col, new_row, new_col))
+                        else:
+                            # Find horizontal and vertical moves
+                            for dr, dc in move_hv:
+                                new_row, new_col = row + dr, col + dc
+                                if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
+                                    valid_moves.append((row, col, new_row, new_col))
+
         return valid_moves
 
     # Parse FEN string
@@ -143,4 +182,5 @@ def fen_to_moves(fen_str):
 
 # Test function
 fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+print(fen_to_board(fen_str))
 print(fen_to_moves(fen_str))

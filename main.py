@@ -19,14 +19,13 @@ def fen_to_board(fen):
     board_str, turn = fen.split(' ')
 
     # Initialize empty board without corners
-    gameboard = [['', '', '', '', '', ''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '', '',''],
-             ['', '', '', '', '', '']]
+    gameboard = [[''] * 8 for _ in range(8)]
+
+    # Mark corners as dead
+    gameboard[0][0] = 'X'
+    gameboard[0][7] = 'X'
+    gameboard[7][0] = 'X'
+    gameboard[7][7] = 'X'
 
     # Convert FEN string to board layout
     row = 0
@@ -38,10 +37,14 @@ def fen_to_board(fen):
             row += 1
             col = 0
         else:
+            # Skip dead spots
+            while gameboard[row][col] == 'X':
+                col += 1
             gameboard[row][col] = char
             col += 1
 
     return gameboard, turn
+
 
 def print_board(gameboard):
     for row in gameboard:
@@ -69,43 +72,31 @@ def count_valid_moves(gameboard, color):
             if piece and piece.lower() == color:  # Check if piece exists and matches color
                 if piece.isupper():  # Check if piece is single
                     # Count horizontal and vertical moves
-                    valid_moves += sum(1 for dr, dc in move_hv if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                    for dr, dc in move_hv:
+                        new_row, new_col = row + dr, col + dc
+                        if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
+                            valid_moves += 1
                 else:  # Check if piece is double
                     # Check if there are two figures on one field
                     if row < 7 and gameboard[row][col].lower() == gameboard[row+1][col].lower():
                         # Count knight-like moves
-                        valid_moves += sum(1 for dr, dc in move_two_fg if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                        for dr, dc in move_two_fg:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
+                                valid_moves += 1
                         # Check for diagonal attack moves
                         for dr, dc in move_diagonal:
-                            if 0 <= row + dr < 8 and 0 <= col + dc < 8 and gameboard[row + dr][col + dc] and gameboard[row + dr][col + dc].lower() != color:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
                                 valid_moves += 1
                     else:
                         # Count horizontal and vertical moves
-                        valid_moves += sum(1 for dr, dc in move_hv if 0 <= row + dr < 8 and 0 <= col + dc < 8 and not gameboard[row + dr][col + dc])
+                        for dr, dc in move_hv:
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
+                                valid_moves += 1
 
     return valid_moves
-
-def create_gameboard():
-    gameboard = []
-    for i in range(8):
-        row = []
-        for j in range(8):
-            if (i == 0 or i == 7) and (j == 0 or j == 7):  # Ecken ausschließen
-                row.append(None)
-            elif i == 0 or i == 7 or j == 0 or j == 7:  # Rand setzen
-                row.append('#')
-            else:  # Innenbereich
-                row.append(' ')
-        gameboard.append(row)
-    return gameboard
-
-def print_gameboard(gameboard):
-    for row in gameboard:
-        print(' '.join(row))
-
-    board = create_gameboard()
-    print_gameboard(board)
-
 
 def fen_to_moves(fen_str):
     # Function to count valid moves for a given color

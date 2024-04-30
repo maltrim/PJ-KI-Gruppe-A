@@ -153,19 +153,19 @@ def fen_to_moves(fen_str):
     # Parse FEN string
     gameboard, turn = fen_to_board(fen_str)
 
-    # Count valid moves for both players
-    red_moves = count_valid_moves(gameboard, 'r')
-    blue_moves = count_valid_moves(gameboard, 'b')
+    # Count valid moves based on the current turn
+    if turn == 'r':
+        moves = count_valid_moves(gameboard, 'r')
+    elif turn == 'b':
+        moves = count_valid_moves(gameboard, 'b')
+    else:
+        moves = []
 
     # Format output
-    output = f"{len(red_moves) + len(blue_moves)} Züge: "
+    output = f"{len(moves)} Züge: "
 
-    # Append red moves
-    for move in red_moves:
-        output += f"{chr(65 + move[1])}{move[0] + 1}-{chr(65 + move[3])}{move[2] + 1}, "
-
-    # Append blue moves
-    for move in blue_moves:
+    # Append moves
+    for move in moves:
         output += f"{chr(65 + move[1])}{move[0] + 1}-{chr(65 + move[3])}{move[2] + 1}, "
 
     # Remove the last comma and space

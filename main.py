@@ -71,6 +71,9 @@ def count_valid_moves(gameboard, color):
     for row in range(8):
         for col in range(8):
             piece = gameboard[row][col]
+            # Exclude corners from consideration
+            if (row == 0 and col == 0) or (row == 0 and col == 7) or (row == 7 and col == 0) or (row == 7 and col == 7):
+                continue
             if piece and piece.lower() == color:  # Check if piece exists and matches color
                 if piece.isupper():  # Check if piece is single
                     # Count horizontal and vertical moves

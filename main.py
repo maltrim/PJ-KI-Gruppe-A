@@ -54,13 +54,15 @@ def count_valid_moves(gameboard, color):
     valid_moves = 0
 
     # Define moves based on color
-    if color == 'r':
+    if color == 'r0':
         move_hv = move_hv_red
         move_diagonal = move_diagonal_red
+    elif color == 'rr':
         move_two_fg = move_two_fgR
-    elif color == 'b':
+    elif color == 'b0':
         move_hv = move_hv_blue
         move_diagonal = move_diagonal_blue
+    elif color == 'bb':
         move_two_fg = move_two_fgB
     else:
         return 0

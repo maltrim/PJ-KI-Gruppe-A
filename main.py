@@ -79,7 +79,7 @@ def count_valid_moves(gameboard, color):
                     # Count horizontal and vertical moves
                     for dr, dc in move_hv:
                         new_row, new_col = row + dr, col + dc
-                        if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
+                        if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col] and (new_col != 7 and new_row != 0):
                             valid_moves += 1
                 else:  # Check if piece is double
                     # Check if there are two figures on one field

@@ -21,9 +21,14 @@ def fen_to_available_moves(fen):
     
     move_list = get_move_list(gameboard)
     
-    # TODO movelist to string ausgabe!, wrong right now, check output
-    move_list_str = move_list
-    
+    move_list_str = ''
+    move_list_str += str(move_list[0]) + ' Züge: '
+    for i, elem in enumerate(move_list):
+        if i == 0:
+            continue
+        else:
+            move_list_str += str(elem) + ', '
+            
     return move_list_str
 
 def generate_gameboard(fen):
@@ -78,6 +83,9 @@ def get_move_list(gameboard):
                     if x + move[0] >= 7: # TODO test every possibility
                         count += 1
                         list += get_move(x, y, x+move[0], y+move[1])
+                for move in move_diagonal_red:
+                    if x + move[0] >= 7:
+                        count +=1
                 count += 1
                 list += []
             elif elem == 'rr':
@@ -118,3 +126,4 @@ def switch_char(x):
     
     
 fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+print(fen_to_available_moves(fen_str))

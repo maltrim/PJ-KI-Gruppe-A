@@ -16,20 +16,31 @@ move_two_fgB = [(-2,1),(-1,2),(1,2),(2,1)]
 
 def fen_to_available_moves(fen):
     board_str, turn = fen.split(' ')
-    
+
     gameboard = generate_gameboard(board_str)
     
-    move_list = get_move_list(gameboard)
-    
+    move_list = get_move_list(gameboard, turn)
+    # Count valid moves based on the current turn
+    if turn == 'r':
+        moves = get_move_list(gameboard, 'r')
+    elif turn == 'b':
+        moves = get_move_list(gameboard, 'b')
+    else:
+        moves = []
+
+    # Format output
+    output = f"{len(moves)} Züge: "
+
+
     move_list_str = ''
     move_list_str += str(move_list[0]) + ' Züge: '
     for i, elem in enumerate(move_list):
         if i == 0:
             continue
         else:
-            move_list_str += str(elem) + ', '
-            
-    return move_list_str
+            move_list_str += str(elem) + ', ' 
+
+    return move_list_str [:-2]
 
 def generate_gameboard(fen):
     gameboard = [[''] * 8 for _ in range(8)]
@@ -73,88 +84,119 @@ def generate_gameboard(fen):
     
     return gameboard
 
-def get_move_list(gameboard):
+def get_move_list(gameboard, turn):
     move_list = []
     count = 0
     for y, row in enumerate(gameboard):
         for x, elem in enumerate(row):
-            if elem == 'r':  # Für rote Figuren
+            if turn == 'r':
+                if elem == 'r':  # Für rote Figuren
                 # Horizontale und vertikale Bewegungen
-                for move in move_hv_red:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                # Diagonale Bewegungen für Angriffe
-                for move in move_diagonal_red:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                # Erhöhe den Zähler um 1, um den aktuellen Standort der Figur zu berücksichtigen
-                count += 1
-            elif elem == 'rr':
-                for move in move_two_fgR:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == '':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'bb':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'rb':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                        count += 1
-            elif elem == 'b':
-                # Horizontale und vertikale Bewegungen
-                for move in move_hv_blue:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == '':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                # Diagonale Bewegungen für Angriffe
-                for move in move_diagonal_blue:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                # Erhöhe den Zähler um 1, um den aktuellen Standort der Figur zu berücksichtigen
-                count += 1
-            elif elem == 'bb':
-                for move in move_two_fgB:
-                    new_x, new_y = x + move[0], y + move[1]
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == '':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                    if 1 <= new_x < 8 and 1 <= new_y < 8 and gameboard[new_y][new_x] == 'br':
-                        count += 1
-                        move_list += get_move(x, y, new_x, new_y)
-                        count += 1
-        
+                    for move in move_hv_red:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    # Diagonale Bewegungen für Angriffe
+                    for move in move_diagonal_red:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'bb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)    
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                elif elem == 'rr':
+                    for move in move_two_fgR:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'bb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                            count += 1
+                elif elem == 'br':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)        
+            if turn == 'b':
+                if elem == 'b':
+                    # Horizontale und vertikale Bewegungen
+                    for move in move_hv_blue:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    # Diagonale Bewegungen für Angriffe
+                    for move in move_diagonal_blue:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'br':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                elif elem == 'bb':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'br':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)  
+                elif elem == 'rb':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    
+            
     return [count] + move_list
 
     
 def get_move(x, y, x_new, y_new):
-    move = switch_char(x) + str(y) +'-'+ switch_char(x_new) + str(y_new)   
+    move = switch_char(x) + str(y+1) +'-'+ switch_char(x_new) + str(y_new+1)   
     return [move]
 
 def switch_char(x):
@@ -177,5 +219,5 @@ def switch_char(x):
     return a
     
     
-fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
 print(fen_to_available_moves(fen_str))

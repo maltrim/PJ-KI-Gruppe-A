@@ -15,7 +15,7 @@ def main():
   for _ in range(1000):
     start_time = time.time()
     obj.determine_next_move(fen_str_start)
-    end_time() = time.time()
+    end_time = time.time()
     execution_time = end_time - start_time
     execution_times_start.append(execution_time_start)
 
@@ -27,7 +27,7 @@ def main():
   for _ in range(1000):
     start_time = time.time()
     obj.determine_next_move(fen_str_mid)
-    end_time() = time.time()
+    end_time = time.time()
     execution_time = end_time - start_time
     execution_times_mid.append(execution_time_start)
 
@@ -39,7 +39,7 @@ def main():
   for _ in range(1000):
     start_time = time.time()
     obj.determine_next_move(fen_str_end)
-    end_time() = time.time()
+    end_time = time.time()
     execution_time = end_time - start_time
     execution_times_end.append(execution_time_end)
 

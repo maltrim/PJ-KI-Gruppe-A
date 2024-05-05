@@ -234,7 +234,7 @@ def determine_next_move(fen):
     move_list = move_list.pop(0)
     return random.choice(move_list)
 
-#TODO: bei Spielende return true
+#bei Spielende return true
 #mögliche wins:
 #1. Wenn alle gegnerischen Figuren besiegt sind.
 #2. Wenn der Gegner am Zug ist und alle seine Figuren blockiert sin bzw. sich nicht mehr bewegen können.

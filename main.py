@@ -1,3 +1,5 @@
+import random
+
 ##Zuggenerator
 # moves (x,y):
 # valid moves red one figure: left, right, down
@@ -217,7 +219,60 @@ def switch_char(x):
     elif x==7:
         a='H'
     return a
+
+def get_turn(fen):
+    board_str, turn = fen.split(' ')
+    if turn == 'b':
+        return 'b'
+    else:
+        return 'r'
+
+def determine_next_move(fen):
+    gameboard = generate_gameboard(fen)
+    turn = get_turn(fen)
+    move_list = get_move_list(gameboard, turn)
+    move_list = move_list.pop(0)
+    return random.choice(move_list)
+
+#bei Spielende return true
+#mögliche wins:
+#1. Wenn alle gegnerischen Figuren besiegt sind.
+#2. Wenn der Gegner am Zug ist und alle seine Figuren blockiert sin bzw. sich nicht mehr bewegen können.
+#3. Wenn die Figur eines der 6 hinteren Felder des Gegners erreicht.
+#Blue muss dafür Row 8 erreichen
+#Red muss dafür Row 1 erreichen 
+def spielende(fen):
+    board_str, turn = fen.split(' ')
+    gameboard = generate_gameboard(board_str)
     
+    if turn == 'r':
+        opponent = 'b'
+        opponent_row = 8
+    elif turn == 'b':
+        opponent = 'r'
+        opponent_row = 1
+
+    # no figures left
+    opponent_figures_remaining = any(opponent in row for row in gameboard)
+    if not opponent_figures_remaining:
+        return True
+    
+    #no opponents moves left
+    opponent_moves_available = any(get_move_list(gameboard, opponent))
+    if not opponent_moves_available:
+        return True
+    
+    #reach opponent last row
+    for row in gameboard:
+        if opponent in row:
+            if opponent_row == 1:
+                return True  # Red hat die letzte Reihe von Blue erreicht
+            elif opponent_row == 8:
+                return True  # Blue hat die letzte Reihe von Red erreicht
+
+    return False
     
 fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
 print(fen_to_available_moves(fen_str))
+print(determine_next_move(fen_str))
+print(spielende(fen_str))

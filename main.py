@@ -1,182 +1,223 @@
 ##Zuggenerator
-#valid moves red one figure
-move_hv_red = [(1,0), (-1,0), (0,1)]
-#valid moves red attack figure
-move_diagonal_red = [(1,1),(-1,1)]
-#valid moves blue two figures
-move_two_fgR = [(1,2),(-1,2),(2,1),(-2,1)]
+# moves (x,y):
+# valid moves red one figure: left, right, down
+move_hv_red = [(-1,0), (1,0), (0,-1)]
+# valid moves red attack figure: left down, right down
+move_diagonal_red = [(-1,-1),(1,-1)]
+# valid moves red two figures: 2left+down, left+2down, right+2down, 2right+down
+move_two_fgR = [(-2,-1),(-1,-2),(1,-2),(2,-1)]
 
-#valid moves blue one figur
-move_hv_blue = [(1,0), (-1,0), (0,-1)]
-#valid moves blue attack figure
-move_diagonal_blue = [(1,-1),(-1,-1)]
-#valid moves blue two figures
-move_two_fgB = [(1,-2),(-1,-2),(2,-1),(-2,-1)]
+# valid moves blue one figur: right, left, up
+move_hv_blue = [(1,0), (-1,0), (0,1)]
+# valid moves blue attack figure: right upper, left upper
+move_diagonal_blue = [(1,1),(-1,1)]
+# valid moves blue two figures: 2left+up, left+2up, right+2up, 2right+up
+move_two_fgB = [(-2,1),(-1,2),(1,2),(2,1)]
 
-
-def fen_to_board(fen):
-    # Split FEN string to get board layout and turn information
+def fen_to_available_moves(fen):
     board_str, turn = fen.split(' ')
 
-    # Initialize empty board without corners
-    gameboard = [[''] * 8 for _ in range(8)]
-
-    # Mark corners as dead
-    gameboard[0][0] = 'X'
-    gameboard[0][7] = 'X'
-    gameboard[7][0] = 'X'
-    gameboard[7][7] = 'X'
-
-    # Convert FEN string to board layout
-    row = 0
-    col = 0
-    for char in board_str:
-        if char.isdigit():
-            col += int(char)
-        elif char == '/':
-            row += 1
-            col = 0
-        else:
-            # Skip dead spots
-            while gameboard[row][col] == 'X':
-                col += 1
-            gameboard[row][col] = char
-            col += 1
-
-    return gameboard, turn
-
-
-def print_board(gameboard):
-    for row in gameboard:
-        print(" ".join(str(cell) if cell else '.' for cell in row))
-
-def count_valid_moves(gameboard, color):
-    valid_moves = 0
-
-    # Define moves based on color
-    if color == 'r0':
-        move_hv = move_hv_red
-        move_diagonal = move_diagonal_red
-    elif color == 'rr':
-        move_two_fg = move_two_fgR
-    elif color == 'b0':
-        move_hv = move_hv_blue
-        move_diagonal = move_diagonal_blue
-    elif color == 'bb':
-        move_two_fg = move_two_fgB
-    else:
-        return 0
-
-    # Loop through the board
-    for row in range(8):
-        for col in range(8):
-            piece = gameboard[row][col]
-            # Exclude corners from consideration
-            if (row == 0 and col == 0) or (row == 0 and col == 7) or (row == 7 and col == 0) or (row == 7 and col == 7):
-                continue
-            if piece and piece.lower() == color:  # Check if piece exists and matches color
-                if piece.isupper():  # Check if piece is single
-                    # Count horizontal and vertical moves
-                    for dr, dc in move_hv:
-                        new_row, new_col = row + dr, col + dc
-                        if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col] and (new_col != 7 and new_row != 0):
-                            valid_moves += 1
-                else:  # Check if piece is double
-                    # Check if there are two figures on one field
-                    if row < 7 and gameboard[row][col].lower() == gameboard[row+1][col].lower():
-                        # Count knight-like moves
-                        for dr, dc in move_two_fg:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
-                                valid_moves += 1
-                        # Check for diagonal attack moves
-                        for dr, dc in move_diagonal:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
-                                valid_moves += 1
-                    else:
-                        # Count horizontal and vertical moves
-                        for dr, dc in move_hv:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] != 'X' and not gameboard[new_row][new_col]:
-                                valid_moves += 1
-
-    return valid_moves
-
-def fen_to_moves(fen_str):
-    # Function to count valid moves for a given color
-    def count_valid_moves(gameboard, color):
-        valid_moves = []
-
-        # Define moves based on color
-        if color == 'r':
-            move_hv = move_hv_red
-            move_diagonal = move_diagonal_red
-            move_two_fg = move_two_fgR
-        elif color == 'b':
-            move_hv = move_hv_blue
-            move_diagonal = move_diagonal_blue
-            move_two_fg = move_two_fgB
-        else:
-            return []
-
-        # Loop through the board
-        for row in range(8):
-            for col in range(8):
-                piece = gameboard[row][col]
-                if piece and piece.lower() == color:  # Check if piece exists and matches color
-                    if piece.isupper():  # Check if piece is single
-                        # Find horizontal and vertical moves
-                        for dr, dc in move_hv:
-                            new_row, new_col = row + dr, col + dc
-                            if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
-                                valid_moves.append((row, col, new_row, new_col))
-                    else:  # Check if piece is double
-                        # Check if there are two figures on one field
-                        if row < 7 and gameboard[row][col].lower() == gameboard[row+1][col].lower():
-                            # Find knight-like moves
-                            for dr, dc in move_two_fg:
-                                new_row, new_col = row + dr, col + dc
-                                if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
-                                    valid_moves.append((row, col, new_row, new_col))
-                            # Find diagonal attack moves
-                            for dr, dc in move_diagonal:
-                                new_row, new_col = row + dr, col + dc
-                                if 0 <= new_row < 8 and 0 <= new_col < 8 and gameboard[new_row][new_col] and gameboard[new_row][new_col].lower() != color:
-                                    valid_moves.append((row, col, new_row, new_col))
-                        else:
-                            # Find horizontal and vertical moves
-                            for dr, dc in move_hv:
-                                new_row, new_col = row + dr, col + dc
-                                if 0 <= new_row < 8 and 0 <= new_col < 8 and not gameboard[new_row][new_col]:
-                                    valid_moves.append((row, col, new_row, new_col))
-
-        return valid_moves
-
-    # Parse FEN string
-    gameboard, turn = fen_to_board(fen_str)
-
+    gameboard = generate_gameboard(board_str)
+    
+    move_list = get_move_list(gameboard, turn)
     # Count valid moves based on the current turn
     if turn == 'r':
-        moves = count_valid_moves(gameboard, 'r')
+        moves = get_move_list(gameboard, 'r')
     elif turn == 'b':
-        moves = count_valid_moves(gameboard, 'b')
+        moves = get_move_list(gameboard, 'b')
     else:
         moves = []
 
     # Format output
     output = f"{len(moves)} Züge: "
 
-    # Append moves
-    for move in moves:
-        output += f"{chr(65 + move[1])}{move[0] + 1}-{chr(65 + move[3])}{move[2] + 1}, "
 
-    # Remove the last comma and space
-    output = output[:-2]
+    move_list_str = ''
+    move_list_str += str(move_list[0]) + ' Züge: '
+    for i, elem in enumerate(move_list):
+        if i == 0:
+            continue
+        else:
+            move_list_str += str(elem) + ', ' 
 
-    return output
+    return move_list_str [:-2]
 
-# Test function
-fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
-print(fen_to_board(fen_str))
-print(fen_to_moves(fen_str))
+def generate_gameboard(fen):
+    gameboard = [[''] * 8 for _ in range(8)]
+    
+    fen_parts = fen.split('/')
+    fen_parts[0] = '1' + fen_parts[0]
+    fen_parts[7] = '1' + fen_parts[7]
+    
+    for row_index, row in enumerate(fen_parts):
+        column_index = 0
+        for char in row:
+            if char.isdigit():
+                if int(char) >= 1:
+                    column_index += int(char)
+                else:
+                    column_index += 1
+            else:
+                if char == 'b':
+                    if gameboard[row_index][column_index] == 'b':
+                        gameboard[row_index][column_index] = 'bb'
+                        column_index += 1
+                    elif gameboard[row_index][column_index] == 'r':
+                        gameboard[row_index][column_index] = 'rb'
+                        column_index += 1
+                    else:
+                        gameboard[row_index][column_index] = 'b'
+                elif char == 'r':
+                    if gameboard[row_index][column_index] == 'r':
+                        gameboard[row_index][column_index] = 'rr'
+                        column_index += 1
+                    elif gameboard[row_index][column_index] == 'b':
+                        gameboard[row_index][column_index] = 'br'
+                        column_index += 1
+                    else:
+                        gameboard[row_index][column_index] = 'r'
+                
+    gameboard[0][0] = None
+    gameboard[0][7] = None
+    gameboard[7][0] = None
+    gameboard[7][7] = None
+    
+    return gameboard
+
+def get_move_list(gameboard, turn):
+    move_list = []
+    count = 0
+    for y, row in enumerate(gameboard):
+        for x, elem in enumerate(row):
+            if turn == 'r':
+                if elem == 'r':  # Für rote Figuren
+                # Horizontale und vertikale Bewegungen
+                    for move in move_hv_red:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    # Diagonale Bewegungen für Angriffe
+                    for move in move_diagonal_red:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'bb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)    
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                elif elem == 'rr':
+                    for move in move_two_fgR:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'bb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rb':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                            count += 1
+                elif elem == 'br':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)        
+            if turn == 'b':
+                if elem == 'b':
+                    # Horizontale und vertikale Bewegungen
+                    for move in move_hv_blue:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    # Diagonale Bewegungen für Angriffe
+                    for move in move_diagonal_blue:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'br':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                elif elem == 'bb':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'rr':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'br':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)  
+                elif elem == 'rb':
+                    for move in move_two_fgB:
+                        new_x, new_y = x + move[0], y + move[1]
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == '':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'r':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                        if 0 <= new_x < 8 and 0 <= new_y < 8 and gameboard[new_y][new_x] == 'b':
+                            count += 1
+                            move_list += get_move(x, y, new_x, new_y)
+                    
+            
+    return [count] + move_list
+
+    
+def get_move(x, y, x_new, y_new):
+    move = switch_char(x) + str(y+1) +'-'+ switch_char(x_new) + str(y_new+1)   
+    return [move]
+
+def switch_char(x):
+    if x==0:
+        a='A'
+    elif x==1:
+        a='B'
+    elif x==2:
+        a='C'
+    elif x==3:
+        a='D'
+    elif x==4:
+        a='E'
+    elif x==5:
+        a='F'
+    elif x==6:
+        a='G'
+    elif x==7:
+        a='H'
+    return a
+    
+    
+fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
+print(fen_to_available_moves(fen_str))

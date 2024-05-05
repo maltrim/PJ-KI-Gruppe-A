@@ -1,3 +1,5 @@
+import random
+
 ##Zuggenerator
 # moves (x,y):
 # valid moves red one figure: left, right, down
@@ -217,7 +219,21 @@ def switch_char(x):
     elif x==7:
         a='H'
     return a
-    
+
+def get_turn(fen):
+    board_str, turn = fen.split(' ')
+    if turn == 'b':
+        return 'b'
+    else:
+        return 'r'
+
+def determine_next_move(fen):
+    gameboard = generate_gameboard(fen)
+    turn = get_turn(fen)
+    move_list = get_move_list(gameboard, turn)
+    move_list = move_list.pop(0)
+    return random.choice(move_list)
     
 fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
 print(fen_to_available_moves(fen_str))
+print(determine_next_move(fen_str)

@@ -236,4 +236,4 @@ def determine_next_move(fen):
     
 fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
 print(fen_to_available_moves(fen_str))
-print(determine_next_move(fen_str)
+print(determine_next_move(fen_str))

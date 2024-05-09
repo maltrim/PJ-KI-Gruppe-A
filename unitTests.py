@@ -9,7 +9,7 @@ class TestMain(unittest.TestCase):
         self.assertEqual(fen_to_available_moves(fen_str), expected)
  
     def test_generate_gameboard(self):
-        fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
+        fen_str = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 r'
         expected_gameboard = [
             [None, 'r', 'r', 'r', 'r', 'r', 'r', None],
             ['r', 'r', 'r', 'r', 'r', 'r', 'r', 'r'],

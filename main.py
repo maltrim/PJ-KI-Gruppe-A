@@ -272,7 +272,50 @@ def spielende(fen):
 
     return False
     
-fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
-print(fen_to_available_moves(fen_str))
-print(determine_next_move(fen_str))
-print(spielende(fen_str))
+#fen_str = '6/1b0b0b0b0b0b01/1b0b0b0b0b0b01/8/8/1r0r0r0r0r0r01/1r0r0r0r0r0r01/6 b'
+#print(fen_to_available_moves(fen_str))
+#print(determine_next_move(fen_str))
+#print(spielende(fen_str))
+
+def generate_gameboard2():
+    fen = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+    gameboard = [[''] * 8 for _ in range(8)]
+    
+    fen_parts = fen.split('/')
+    fen_parts[0] = '1' + fen_parts[0]
+    fen_parts[7] = '1' + fen_parts[7]
+    
+    for row_index, row in enumerate(fen_parts):
+        column_index = 0
+        for char in row:
+            if char.isdigit():
+                if int(char) >= 1:
+                    column_index += int(char)
+                else:
+                    column_index += 1
+            else:
+                if char == 'b':
+                    if gameboard[row_index][column_index] == 'b':
+                        gameboard[row_index][column_index] = 'bb'
+                        column_index += 1
+                    elif gameboard[row_index][column_index] == 'r':
+                        gameboard[row_index][column_index] = 'rb'
+                        column_index += 1
+                    else:
+                        gameboard[row_index][column_index] = 'b'
+                elif char == 'r':
+                    if gameboard[row_index][column_index] == 'r':
+                        gameboard[row_index][column_index] = 'rr'
+                        column_index += 1
+                    elif gameboard[row_index][column_index] == 'b':
+                        gameboard[row_index][column_index] = 'br'
+                        column_index += 1
+                    else:
+                        gameboard[row_index][column_index] = 'r'
+                
+    gameboard[0][0] = None
+    gameboard[0][7] = None
+    gameboard[7][0] = None
+    gameboard[7][7] = None
+    
+    return gameboard

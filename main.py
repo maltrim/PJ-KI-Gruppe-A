@@ -220,6 +220,26 @@ def switch_char(x):
         a='H'
     return a
 
+
+def switch_char2(x):
+    if x=='A':
+        a=0
+    elif x=='B':
+        a=1
+    elif x=='C':
+        a=2
+    elif x=='D':
+        a=3
+    elif x=='E':
+        a=4
+    elif x=='F':
+        a=5
+    elif x=='G':
+        a=6
+    elif x=='H':
+        a=7
+    return a
+
 def get_turn(fen):
     board_str, turn = fen.split(' ')
     if turn == 'b':

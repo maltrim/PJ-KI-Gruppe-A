@@ -149,9 +149,8 @@ class Game:
         #reach opponent last row
         for row in gameboard:
             for opp in opponent:
-                if opp in row:
-                    if opponent_row == row:
-                        return True
+                if opp in row and gameboard.index(row) == opponent_row:
+                    return True
                 
         return False
             

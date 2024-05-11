@@ -20,7 +20,7 @@ class TestMain(unittest.TestCase):
             ['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
             [None, 'b', 'b', 'b', 'b', 'b', 'b', None]
             ]     
-    self.assertEqual(generate_gameboard(fen_str), expected_gameboard)
+        self.assertEqual(generate_gameboard(fen_str), expected_gameboard)
 
     def test_get_move_list(self):
         gameboard =[

@@ -32,97 +32,127 @@ class Game:
         if (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'b'):
             self.board[end_y][end_x] ='b'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'r'):
             self.board[end_y][end_x] ='r'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'rr'):
             self.board[end_y][end_x] ='r'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'bb'):
             self.board[end_y][end_x] ='b'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'rb'):
             self.board[end_y][end_x] ='b'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'br'):
             self.board[end_y][end_x] ='r'
             self.board[start_y][start_x] = 'b'
+            return
             
         # Zielfeld hat ein Stein:
         if (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'r'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'b'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'br'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'rb'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'bb'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'rr'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'r'): # ab hier mit blau als ziel
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'b'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'rb'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'br'):
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'bb'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'rr'):
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = 'r'
+            return
             
         # Zielfeld hat zwei Steine:
         if (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'b'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'bb'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'rb'):
             self.board[end_y][end_x] ='rb'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'r'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'rr'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'br'):
             self.board[end_y][end_x] ='rr'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'b'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'bb'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = 'b'
+            return
         elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'rb'):
             self.board[end_y][end_x] ='bb'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'r'):
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = ''
+            return
         elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'rr'):
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = 'r'
+            return
         elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'br'):
             self.board[end_y][end_x] ='br'
             self.board[start_y][start_x] = 'b'
+            return
         
     def is_game_over(self):
         gameboard = self.board
@@ -175,6 +205,7 @@ class Game:
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
             next_move = current_player.determine_next_move()
+            print(current_player.name)
             self.make_move(next_move)
             self.current_player_index = (self.current_player_index + 1) % 2
             print(self.board)

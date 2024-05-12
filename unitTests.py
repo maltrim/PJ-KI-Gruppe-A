@@ -1,5 +1,6 @@
 import unittest
 from main import *
+from game import *
 
 class TestMain(unittest.TestCase):
 

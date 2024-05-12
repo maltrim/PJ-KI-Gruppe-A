@@ -38,8 +38,9 @@ class TestMain(unittest.TestCase):
         expected = {34,'B7-A7','B7-C7','B7-B6','C7-B7','C7-D7','C7-C6','D7-C7','D7-E7','D7-D6','E7-D7','E7-F7','E7-E6','F7-E7','F7-G7','F7-F6','G7-F7','G7-H7','G7-G6','B8-C8','B8-B7','C8-B8','C8-D8','C8-C7','D8-C8','D8-E8','D8-D7','E8-D8','E8-F8','E8-E7','F8-E8','F8-G8','F8-F7','G8-F8','G8-G7'}
         self.assertEqual(tested, expected)
 
-    #def test_get_move(self):
-    #    move = switch_char(x) + str(y+1) +'-'+ switch_char(x_new) + str(y_new+1)
+    def test_get_move(self):
+        expected = ['D6-B7']
+        self.assertEqual(get_move(3,5,1,6),expected)
     
     def test_is_game_over(self):
         gameboard =[
@@ -58,4 +59,6 @@ obj = TestMain()
 print(obj.test_fen_to_available_moves())
 print(obj.test_generate_gameboard())
 print(obj.test_get_move_list())
+print(obj.test_get_move())
+print(obj.test_is_game_over())
 

@@ -38,8 +38,21 @@ class TestMain(unittest.TestCase):
 
     #def test_get_move(self):
     #    move = switch_char(x) + str(y+1) +'-'+ switch_char(x_new) + str(y_new+1)
-
+    
+    def test_is_game_over(self):
+        gameboard =[
+            [None, '', '', '', '', '', '', None],
+            ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', 'b', 'bb', '', '', ''],
+                ['', 'r', '', '', '', '', '', ''],
+            ['', 'b', '', '', '', 'rr', '', ''],
+            [None, '', '', '', 'r', '', '', None]
+            ]    
+        expected = True
 obj = TestMain()
 print(obj.test_fen_to_available_moves())
 print(obj.test_generate_gameboard())
 print(obj.test_get_move_list())
+

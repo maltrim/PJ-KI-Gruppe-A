@@ -26,6 +26,7 @@ class Game:
         start_y = int(start_pos[1]) - 1
         end_x = switch_char2(end_pos[0])
         end_y = int(end_pos[1]) - 1
+        print(move)
         
         # Zielfeld ist frei:
         if (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'b'):
@@ -142,6 +143,7 @@ class Game:
                 count += 1
             
         if count == 0:
+            print('Game over, no figures left!')
             return True
         else:
             count = 0
@@ -153,6 +155,7 @@ class Game:
                 count += 1
             
         if count == 0:
+            print('Game over, no available moves left!')
             return True
         else:
             count = 0
@@ -161,6 +164,7 @@ class Game:
         for opp in opponents:
             for row_index, row in enumerate(gameboard):
                 if opp in row and row_index == own_row:
+                    print('Game over, reached the end!')
                     return True
                 
         return False
@@ -169,11 +173,11 @@ class Game:
             
     def play(self):
         while not self.is_game_over():
-            print(self.board)
             current_player = self.players[self.current_player_index]
             next_move = current_player.determine_next_move()
             self.make_move(next_move)
             self.current_player_index = (self.current_player_index + 1) % 2
+            print(self.board)
             
 blue = AI('b')
 red = AI('r')

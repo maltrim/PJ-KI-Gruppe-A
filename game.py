@@ -126,33 +126,46 @@ class Game:
     def is_game_over(self):
         gameboard = self.board
         turn = self.players[self.current_player_index].name
+        count = 0
         
         if turn == 'r':
-            opponent = ['b','rb','bb']
-            opponent_row = 0
+            opponents = ['b','rb','bb']
+            own_row = 7
         elif turn == 'b':
-            opponent = ['r','br','rr']
-            opponent_row = 7
+            opponents = ['r','br','rr']
+            own_row = 0
 
-        # no figures left
-        for opp in opponent:
+        # no figures left for all opponents
+        for opp in opponents:
             opponent_figures_remaining = any(opp in row for row in gameboard)
-            if not opponent_figures_remaining:
-                return True
-        
-        #no opponents moves left
-        for opp in opponent:
+            if opponent_figures_remaining:
+                count += 1
+            
+        if count == 0:
+            return True
+        else:
+            count = 0
+
+        # no opponents moves left for all opponents
+        for opp in opponents:
             opponent_moves_available = any(get_move_list(gameboard, opp))
-            if not opponent_moves_available:
-                return True
-        
-        #reach opponent last row
-        for row in gameboard:
-            for opp in opponent:
-                if opp in row and gameboard.index(row) == opponent_row:
+            if opponent_moves_available:
+                count += 1
+            
+        if count == 0:
+            return True
+        else:
+            count = 0
+
+        # reach opponent last row for all opponents
+        for opp in opponents:
+            for row_index, row in enumerate(gameboard):
+                if opp in row and row_index == own_row:
                     return True
                 
         return False
+
+
             
     def play(self):
         while not self.is_game_over():

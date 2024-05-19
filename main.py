@@ -222,23 +222,7 @@ def switch_char(x):
 
 
 def switch_char2(x):
-    if x=='A':
-        a=0
-    elif x=='B':
-        a=1
-    elif x=='C':
-        a=2
-    elif x=='D':
-        a=3
-    elif x=='E':
-        a=4
-    elif x=='F':
-        a=5
-    elif x=='G':
-        a=6
-    elif x=='H':
-        a=7
-    return a
+    return ord(x.upper()) - ord('A')
 
 def get_turn(fen):
     board_str, turn = fen.split(' ')
@@ -339,3 +323,96 @@ def generate_gameboard2():
     gameboard[7][7] = None
     
     return gameboard
+
+def make_move(board, move):
+    def get_position(pos):
+        x = switch_char2(pos[0])
+        y = int(pos[1]) - 1
+        return x, y
+
+    start_pos, end_pos = move.split('-')
+    start_x, start_y = get_position(start_pos)
+    end_x, end_y = get_position(end_pos)
+    print(move)
+
+    def update_board(start, end, new_start_val, new_end_val):
+        start_x, start_y = start
+        end_x, end_y = end
+        board[end_y][end_x] = new_end_val
+        board[start_y][start_x] = new_start_val
+
+    start_val = board[start_y][start_x]
+    end_val = board[end_y][end_x]
+
+    if end_val == '':
+        if start_val == 'b' or start_val == 'r':
+            update_board((start_x, start_y), (end_x, end_y), '', start_val)
+        elif start_val == 'rr' or start_val == 'bb':
+            update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0])
+        elif start_val == 'rb' or start_val == 'br':
+            update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
+    else:
+        if (start_val, end_val) in [('r', 'r'), ('b', 'b')]:
+            update_board((start_x, start_y), (end_x, end_y), '', start_val * 2)
+        elif (start_val, end_val) in [('r', 'b'), ('b', 'r')]:
+            update_board((start_x, start_y), (end_x, end_y), '', start_val + end_val)
+        elif (start_val, end_val) in [('rr', 'b'), ('rb', 'r'), ('br', 'b'), ('bb', 'r')]:
+            update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
+        elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
+            update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
+
+
+def evaluate_board(board, player):
+    opponent = 'r' if player == 'b' else 'b'
+    score = 0
+
+    # Define the value for each type of piece
+    single_value = 1
+    double_value = 3
+    mixed_double_value = 2
+    
+    # Define the importance of reaching the opponent's back rank
+    back_rank_bonus = 100
+    capture_bonus = 10
+
+    # Loop through the board to evaluate the positions
+    for row in range(len(board)):
+        for col in range(len(board[row])):
+            piece = board[row][col]
+            
+            if piece == 'b':
+                score += single_value if player == 'b' else -single_value
+            elif piece == 'r':
+                score += single_value if player == 'r' else -single_value
+            elif piece == 'bb':
+                score += double_value if player == 'b' else -double_value
+            elif piece == 'rr':
+                score += double_value if player == 'r' else -double_value
+            elif piece == 'br' or piece == 'rb':
+                score += mixed_double_value if player == 'b' else -mixed_double_value
+            
+            # Check if a piece has reached the opponent's back rank
+            if piece in ['b', 'bb'] and row == len(board) - 1 and player == 'b':
+                score += back_rank_bonus
+            elif piece in ['r', 'rr'] and row == 0 and player == 'r':
+                score += back_rank_bonus
+    
+    # Use get_move_list to get all possible moves for the current player
+    possible_moves = get_move_list(board, player)
+    
+    for move in possible_moves:
+        new_board = make_move(board, move)
+        move_score = evaluate_board(new_board, player)
+        
+        # Adjust score based on the future board state
+        score += move_score / len(possible_moves)  # Average the potential outcomes
+
+    return score
+
+def count_pieces(board, turn):
+    count = 0
+    for row in board:
+        for cell in row:
+            if turn in cell:
+                count += 1
+    return count

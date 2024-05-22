@@ -52,18 +52,44 @@ class AI:
                 if beta <= alpha:
                     break
             return min_eval, best_move
-
+        
     def simulate_move(self, board, move):
-        # Make a deep copy of the board
-        new_board = [row[:] for row in board]
+        def get_position(pos):
+            x = switch_char2(pos[0])
+            y = int(pos[1]) - 1
+            return x, y
+
         start_pos, end_pos = move.split('-')
-        start_x = switch_char2(start_pos[0])
-        start_y = int(start_pos[1]) - 1
-        end_x = switch_char2(end_pos[0])
-        end_y = int(end_pos[1]) - 1
-        new_board[end_y][end_x] = new_board[start_y][start_x]
-        new_board[start_y][start_x] = ''
-        return new_board
+        start_x, start_y = get_position(start_pos)
+        end_x, end_y = get_position(end_pos)
+
+        def update_board(start, end, new_start_val, new_end_val):
+            start_x, start_y = start
+            end_x, end_y = end
+            board[end_y][end_x] = new_end_val
+            board[start_y][start_x] = new_start_val
+
+        start_val = board[start_y][start_x]
+        end_val = board[end_y][end_x]
+
+        if end_val == '':
+            if start_val == 'b' or start_val == 'r':
+                update_board((start_x, start_y), (end_x, end_y), '', start_val)
+            elif start_val == 'rr' or start_val == 'bb':
+                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0])
+            elif start_val == 'rb' or start_val == 'br':
+                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
+        else:
+            if (start_val, end_val) in [('r', 'r'), ('b', 'b')]:
+                update_board((start_x, start_y), (end_x, end_y), '', start_val * 2)
+            elif (start_val, end_val) in [('r', 'b'), ('b', 'r')]:
+                update_board((start_x, start_y), (end_x, end_y), '', start_val + end_val)
+            elif (start_val, end_val) in [('rr', 'b'), ('rb', 'r'), ('br', 'b'), ('bb', 'r')]:
+                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
+            elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
+                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
+
+        return board
 
     def evaluate_board(self, board, player):
         opponent = 'r' if player == 'b' else 'b'
@@ -202,8 +228,6 @@ class Game:
                     return True
                 
         return False
-
-
             
     def play(self):
         while not self.is_game_over():

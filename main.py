@@ -333,7 +333,6 @@ def make_move(board, move):
     start_pos, end_pos = move.split('-')
     start_x, start_y = get_position(start_pos)
     end_x, end_y = get_position(end_pos)
-    print(move)
 
     def update_board(start, end, new_start_val, new_end_val):
         start_x, start_y = start
@@ -360,6 +359,8 @@ def make_move(board, move):
             update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
         elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
             update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
+            
+    return board
 
 
 def evaluate_board(board, player):
@@ -398,14 +399,14 @@ def evaluate_board(board, player):
                 score += back_rank_bonus
     
     # Use get_move_list to get all possible moves for the current player
-    possible_moves = get_move_list(board, player)
-    
-    for move in possible_moves:
-        new_board = make_move(board, move)
-        move_score = evaluate_board(new_board, player)
-        
-        # Adjust score based on the future board state
-        score += move_score / len(possible_moves)  # Average the potential outcomes
+    #possible_moves = get_move_list(board, player)
+    #
+    #for move in possible_moves:
+    #    new_board = make_move(board, move)
+    #    move_score = evaluate_board(new_board, player)
+    #    
+    #    # Adjust score based on the future board state
+    #    score += move_score / len(possible_moves)  # Average the potential outcomes
 
     return score
 
@@ -416,3 +417,6 @@ def count_pieces(board, turn):
             if turn in cell:
                 count += 1
     return count
+
+def switch_player(player):
+    return 'b' if player == 'r' else 'r'

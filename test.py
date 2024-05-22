@@ -6,17 +6,14 @@ class AI:
     def __init__(self, name):
         self.name = name # Farbe
         self.movestack = []
-    
-    def __init__(self, name):
-        self.name = name # Farbe
 
     def determine_next_move(self):
         _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
-        self.movestack(move)
+        self.addMovestack(move)
         return move
     
-    def movestack(self, move):
-        self.movestack += move
+    def addMovestack(self, move):
+        self.movestack.append(move)
         return
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player):
@@ -91,7 +88,10 @@ class AI:
 
         return board
 
-    def evaluate_board(self, board, player):
+    def evaluate_board(self, board, player, depth=3):
+        if depth == 0:
+            return self.static_evaluation(board, player)
+        
         opponent = 'r' if player == 'b' else 'b'
         score = 0
 
@@ -132,10 +132,46 @@ class AI:
         
         for move in possible_moves:
             new_board = self.simulate_move(board, move)
-            move_score = self.evaluate_board(new_board, player)
+            move_score = self.evaluate_board(new_board, player, depth - 1)
             
             # Adjust score based on the future board state
             score += move_score / len(possible_moves)  # Average the potential outcomes
+
+        return score
+    
+    def static_evaluation(self, board, player):
+        opponent = 'r' if player == 'b' else 'b'
+        score = 0
+
+        # Define the value for each type of piece
+        single_value = 1
+        double_value = 3
+        mixed_double_value = 2
+        
+        # Define the importance of reaching the opponent's back rank
+        back_rank_bonus = 100
+
+        # Loop through the board to evaluate the positions
+        for row in range(len(board)):
+            for col in range(len(board[row])):
+                piece = board[row][col]
+                
+                if piece == 'b':
+                    score += single_value if player == 'b' else -single_value
+                elif piece == 'r':
+                    score += single_value if player == 'r' else -single_value
+                elif piece == 'bb':
+                    score += double_value if player == 'b' else -double_value
+                elif piece == 'rr':
+                    score += double_value if player == 'r' else -double_value
+                elif piece == 'br' or piece == 'rb':
+                    score += mixed_double_value if player == 'b' else -mixed_double_value
+                
+                # Check if a piece has reached the opponent's back rank
+                if piece in ['b', 'bb'] and row == len(board) - 1 and player == 'b':
+                    score += back_rank_bonus
+                elif piece in ['r', 'rr'] and row == 0 and player == 'r':
+                    score += back_rank_bonus
 
         return score
 

@@ -128,6 +128,7 @@ class AI:
         
         # Use get_move_list to get all possible moves for the current player
         possible_moves = get_move_list(board, player)
+        possible_moves.pop(0)
         
         for move in possible_moves:
             new_board = self.simulate_move(board, move)

@@ -5,16 +5,21 @@ from main import generate_gameboard2, get_move_list, switch_char2
 class AI:
     def __init__(self, name):
         self.name = name # Farbe
-        self.movestack = []
+        
+    def determine_next_move(self):
+        move_list = get_move_list(game.board, self.name)
+        move_list.pop(0) # Count entfernen
+        if move_list:
+            return random.choice(move_list)
+        else:
+            return None # keine gültigen Züge
+    
+    def __init__(self, name):
+        self.name = name # Farbe
 
     def determine_next_move(self):
         _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
-        self.addMovestack(move)
         return move
-    
-    def addMovestack(self, move):
-        self.movestack.append(move)
-        return
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player):
         if depth == 0 or game.is_game_over():
@@ -49,131 +54,25 @@ class AI:
                 if beta <= alpha:
                     break
             return min_eval, best_move
-        
+
     def simulate_move(self, board, move):
-        def get_position(pos):
-            x = switch_char2(pos[0])
-            y = int(pos[1]) - 1
-            return x, y
-
+        # Make a deep copy of the board
+        new_board = [row[:] for row in board]
         start_pos, end_pos = move.split('-')
-        start_x, start_y = get_position(start_pos)
-        end_x, end_y = get_position(end_pos)
+        start_x = switch_char2(start_pos[0])
+        start_y = int(start_pos[1]) - 1
+        end_x = switch_char2(end_pos[0])
+        end_y = int(end_pos[1]) - 1
+        new_board[end_y][end_x] = new_board[start_y][start_x]
+        new_board[start_y][start_x] = ''
+        return new_board
 
-        def update_board(start, end, new_start_val, new_end_val):
-            start_x, start_y = start
-            end_x, end_y = end
-            board[end_y][end_x] = new_end_val
-            board[start_y][start_x] = new_start_val
-
-        start_val = board[start_y][start_x]
-        end_val = board[end_y][end_x]
-
-        if end_val == '':
-            if start_val == 'b' or start_val == 'r':
-                update_board((start_x, start_y), (end_x, end_y), '', start_val)
-            elif start_val == 'rr' or start_val == 'bb':
-                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0])
-            elif start_val == 'rb' or start_val == 'br':
-                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
-        else:
-            if (start_val, end_val) in [('r', 'r'), ('b', 'b')]:
-                update_board((start_x, start_y), (end_x, end_y), '', start_val * 2)
-            elif (start_val, end_val) in [('r', 'b'), ('b', 'r')]:
-                update_board((start_x, start_y), (end_x, end_y), '', start_val + end_val)
-            elif (start_val, end_val) in [('rr', 'b'), ('rb', 'r'), ('br', 'b'), ('bb', 'r')]:
-                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
-            elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
-                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
-
-        return board
-
-    def evaluate_board(self, board, player, depth=3):
-        if depth == 0:
-            return self.static_evaluation(board, player)
-        
-        opponent = 'r' if player == 'b' else 'b'
-        score = 0
-
-        # Define the value for each type of piece
-        single_value = 1
-        double_value = 3
-        mixed_double_value = 2
-        
-        # Define the importance of reaching the opponent's back rank
-        back_rank_bonus = 100
-        capture_bonus = 10
-
-        # Loop through the board to evaluate the positions
-        for row in range(len(board)):
-            for col in range(len(board[row])):
-                piece = board[row][col]
-                
-                if piece == 'b':
-                    score += single_value if player == 'b' else -single_value
-                elif piece == 'r':
-                    score += single_value if player == 'r' else -single_value
-                elif piece == 'bb':
-                    score += double_value if player == 'b' else -double_value
-                elif piece == 'rr':
-                    score += double_value if player == 'r' else -double_value
-                elif piece == 'br' or piece == 'rb':
-                    score += mixed_double_value if player == 'b' else -mixed_double_value
-                
-                # Check if a piece has reached the opponent's back rank
-                if piece in ['b', 'bb'] and row == len(board) - 1 and player == 'b':
-                    score += back_rank_bonus
-                elif piece in ['r', 'rr'] and row == 0 and player == 'r':
-                    score += back_rank_bonus
-        
-        # Use get_move_list to get all possible moves for the current player
-        possible_moves = get_move_list(board, player)
-        possible_moves.pop(0)
-        
-        for move in possible_moves:
-            new_board = self.simulate_move(board, move)
-            move_score = self.evaluate_board(new_board, player, depth - 1)
-            
-            # Adjust score based on the future board state
-            score += move_score / len(possible_moves)  # Average the potential outcomes
-
-        return score
-    
-    def static_evaluation(self, board, player):
-        opponent = 'r' if player == 'b' else 'b'
-        score = 0
-
-        # Define the value for each type of piece
-        single_value = 1
-        double_value = 3
-        mixed_double_value = 2
-        
-        # Define the importance of reaching the opponent's back rank
-        back_rank_bonus = 100
-
-        # Loop through the board to evaluate the positions
-        for row in range(len(board)):
-            for col in range(len(board[row])):
-                piece = board[row][col]
-                
-                if piece == 'b':
-                    score += single_value if player == 'b' else -single_value
-                elif piece == 'r':
-                    score += single_value if player == 'r' else -single_value
-                elif piece == 'bb':
-                    score += double_value if player == 'b' else -double_value
-                elif piece == 'rr':
-                    score += double_value if player == 'r' else -double_value
-                elif piece == 'br' or piece == 'rb':
-                    score += mixed_double_value if player == 'b' else -mixed_double_value
-                
-                # Check if a piece has reached the opponent's back rank
-                if piece in ['b', 'bb'] and row == len(board) - 1 and player == 'b':
-                    score += back_rank_bonus
-                elif piece in ['r', 'rr'] and row == 0 and player == 'r':
-                    score += back_rank_bonus
-
-        return score
+    def evaluate_board(self, board, player):
+        # Simple evaluation function: count the number of pieces
+        opponent = self.switch_player(player)
+        player_pieces = sum(row.count(player) for row in board)
+        opponent_pieces = sum(row.count(opponent) for row in board)
+        return player_pieces - opponent_pieces
 
     def switch_player(self, player):
         return 'b' if player == 'r' else 'r'
@@ -184,43 +83,141 @@ class Game:
         self.players = [p1, p2]
         self.current_player_index = 0
         
-    def make_move(board, move):
-        def get_position(pos):
-            x = switch_char2(pos[0])
-            y = int(pos[1]) - 1
-            return x, y
-
+    def make_move(self, move):
+        # Zerlege den Zug in seine Bestandteile
         start_pos, end_pos = move.split('-')
-        start_x, start_y = get_position(start_pos)
-        end_x, end_y = get_position(end_pos)
+        start_x = switch_char2(start_pos[0])
+        start_y = int(start_pos[1]) - 1
+        end_x = switch_char2(end_pos[0])
+        end_y = int(end_pos[1]) - 1
         print(move)
-
-        def update_board(start, end, new_start_val, new_end_val):
-            start_x, start_y = start
-            end_x, end_y = end
-            board[end_y][end_x] = new_end_val
-            board[start_y][start_x] = new_start_val
-
-        start_val = board[start_y][start_x]
-        end_val = board[end_y][end_x]
-
-        if end_val == '':
-            if start_val == 'b' or start_val == 'r':
-                update_board((start_x, start_y), (end_x, end_y), '', start_val)
-            elif start_val == 'rr' or start_val == 'bb':
-                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0])
-            elif start_val == 'rb' or start_val == 'br':
-                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
-        else:
-            if (start_val, end_val) in [('r', 'r'), ('b', 'b')]:
-                update_board((start_x, start_y), (end_x, end_y), '', start_val * 2)
-            elif (start_val, end_val) in [('r', 'b'), ('b', 'r')]:
-                update_board((start_x, start_y), (end_x, end_y), '', start_val + end_val)
-            elif (start_val, end_val) in [('rr', 'b'), ('rb', 'r'), ('br', 'b'), ('bb', 'r')]:
-                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
-            elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
-                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
+        
+        # Zielfeld ist frei:
+        if (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'b'):
+            self.board[end_y][end_x] ='b'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'r'):
+            self.board[end_y][end_x] ='r'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'rr'):
+            self.board[end_y][end_x] ='r'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'bb'):
+            self.board[end_y][end_x] ='b'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'rb'):
+            self.board[end_y][end_x] ='b'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == '' and self.board[start_y][start_x] == 'br'):
+            self.board[end_y][end_x] ='r'
+            self.board[start_y][start_x] = 'b'
+            return
             
+        # Zielfeld hat ein Stein:
+        if (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'r'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'b'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'br'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'rb'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'bb'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'r' and self.board[start_y][start_x] == 'rr'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'r'): # ab hier mit blau als ziel
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'b'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'rb'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'br'):
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'bb'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'b' and self.board[start_y][start_x] == 'rr'):
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = 'r'
+            return
+            
+        # Zielfeld hat zwei Steine:
+        if (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'b'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'bb'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'rr' and self.board[start_y][start_x] == 'rb'):
+            self.board[end_y][end_x] ='rb'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'r'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'rr'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'rb' and self.board[start_y][start_x] == 'br'):
+            self.board[end_y][end_x] ='rr'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'b'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'bb'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = 'b'
+            return
+        elif (self.board[end_y][end_x] == 'br' and self.board[start_y][start_x] == 'rb'):
+            self.board[end_y][end_x] ='bb'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'r'):
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = ''
+            return
+        elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'rr'):
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = 'r'
+            return
+        elif (self.board[end_y][end_x] == 'bb' and self.board[start_y][start_x] == 'br'):
+            self.board[end_y][end_x] ='br'
+            self.board[start_y][start_x] = 'b'
+            return
+        
     def is_game_over(self):
         gameboard = self.board
         turn = self.players[self.current_player_index].name
@@ -265,6 +262,8 @@ class Game:
                     return True
                 
         return False
+
+
             
     def play(self):
         while not self.is_game_over():

@@ -282,7 +282,7 @@ def spielende(fen):
 #print(spielende(fen_str))
 
 def generate_gameboard2():
-    fen = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+    fen = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 r'
     gameboard = [[''] * 8 for _ in range(8)]
     
     fen_parts = fen.split('/')
@@ -363,6 +363,12 @@ def make_move(board, move):
     return board
 
 
+def ev_board(board, player):
+    opponent = 'r' if player == 'b' else 'b'
+    score = 0
+
+    return score
+
 def evaluate_board(board, player):
     opponent = 'r' if player == 'b' else 'b'
     score = 0
@@ -397,7 +403,20 @@ def evaluate_board(board, player):
                 score += back_rank_bonus
             elif piece in ['r', 'rr'] and row == 0 and player == 'r':
                 score += back_rank_bonus
-    
+
+    for row in range(len(board)):
+        for col in range(len(board[row])):
+            piece = board[row][col]
+            if piece in ['b', 'bb', 'rb'] and player == 'b':
+                # Check for captures by 'b' player
+                if (row > 1 and col > 1 and board[row-1][col-1] in ['r', 'rr'] and board[row-2][col-2] == 'e') or \
+                   (row > 1 and col < len(board[row]) - 2 and board[row-1][col+1] in ['r', 'rr'] and board[row-2][col+2] == 'e'):
+                    score += capture_bonus
+            elif piece in ['r', 'rr', 'br'] and player == 'r':
+                # Check for captures by 'r' player
+                if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb'] and board[row+2][col-2] == 'e') or \
+                   (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb'] and board[row+2][col+2] == 'e'):
+                    score += capture_bonus
     # Use get_move_list to get all possible moves for the current player
     #possible_moves = get_move_list(board, player)
     #

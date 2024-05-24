@@ -8,7 +8,7 @@ class AI:
         self.movelist = []
         
     def determine_next_move(self):
-        _, move = self.alpha_beta_search(game.board, self.name, 1, -math.inf, math.inf, True)
+        _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move
     
@@ -47,7 +47,8 @@ class AI:
             return min_eval, best_move
         
     def simulate_move(self, board, move):
-        new_board = make_move(board, move)
+        new_board = [row[:] for row in board]  # Create a copy of the board
+        new_board = make_move(new_board, move)
         return new_board
     
 class Game:

@@ -8,6 +8,7 @@ class AI:
         self.movelist = []
         
     def determine_next_move(self):
+        #_ , move = self.minMax_search(game.board,self.name, 3)
         _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move
@@ -49,19 +50,34 @@ class AI:
 
         valid_moves = get_move_list(board, player)
         valid_moves.pop(0) # Remove the count
-        max_eval = -math.inf
-        best_move = None
-        for move in valid_moves:
-            new_board = self.simulate_move(board, move)
-            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, beta, alpha, -maximizing_player)
-            if eval > max_eval:
-                max_eval = eval
-                best_move = move
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break
-        return max_eval, best_move
-        
+        if maximizing_player:
+            max_eval = -math.inf
+            best_move = None
+            for move in valid_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, beta, alpha, -maximizing_player)
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval, best_move
+        else:
+            min_eval = math.inf
+            best_move = None
+            for move in valid_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, -beta, -alpha, maximizing_player)
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+                alpha = max(alpha, eval)
+                if beta >= alpha:
+                    break
+            return min_eval, best_move
+
+
     def simulate_move(self, board, move):
         new_board = [row[:] for row in board]  # Create a copy of the board
         new_board = make_move(new_board, move)

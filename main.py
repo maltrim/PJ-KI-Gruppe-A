@@ -362,13 +362,6 @@ def make_move(board, move):
             
     return board
 
-
-def ev_board(board, player):
-    opponent = 'r' if player == 'b' else 'b'
-    score = 0
-
-    return score
-
 def evaluate_board(board, player):
     opponent = 'r' if player == 'b' else 'b'
     score = 0

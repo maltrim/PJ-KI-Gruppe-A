@@ -3,13 +3,19 @@ import random
 from main import generate_gameboard2, get_move_list, switch_char2, switch_player, make_move, evaluate_board
 
 class AI:
-    def __init__(self, name):
-        self.name = name # Farbe
+    def __init__(self, name, max_history_length=2):
+        self.name = name  # Farbe
         self.movelist = []
+        self.history = []  # Keep track of the recent moves
+        self.max_history_length = max_history_length
         
     def determine_next_move(self):
-        _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
+        _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, False)
         self.movelist.append(move)
+        self.history.append(move)
+        # Maintain the history length
+        if len(self.history) > self.max_history_length:
+            self.history.pop(0)
         return move
     
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player):
@@ -19,12 +25,15 @@ class AI:
         valid_moves = get_move_list(board, player)
         valid_moves.pop(0) # Remove the count
 
+        # Filter out recent moves to avoid loops
+        valid_moves = [move for move in valid_moves if move not in self.history]
+
         if maximizing_player:
             max_eval = -math.inf
             best_move = None
             for move in valid_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, False)
+                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, True)
                 if eval > max_eval:
                     max_eval = eval
                     best_move = move
@@ -37,7 +46,7 @@ class AI:
             best_move = None
             for move in valid_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, True)
+                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, False)
                 if eval < min_eval:
                     min_eval = eval
                     best_move = move

@@ -9,9 +9,11 @@ class AI:
         
     def determine_next_move(self):
         #_ , move = self.minMax_search(game.board,self.name, 3)
-        _, move = self.alpha_beta_search(game.board, self.name, 0, 3, -math.inf, math.inf, True)
+        _, move = self.alpha_beta_search(game.board, self.name, 1, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move
+    
+    #TODO: Funktion statt maxDepth fürs zeitliche festlegen? oder wie wollen wir es festelegen?
 
     #läuft die implementierung richtig?
     def minMax_search(self, board, player, depth, maxDepth, turnBlue):

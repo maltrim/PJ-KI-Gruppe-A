@@ -9,6 +9,7 @@ class AI:
         
     def determine_next_move(self):
         #_ , move = self.minMax_search(game.board,self.name, 3)
+        # müssen wir die funktion 2 mal aufrufen für rot und blau? und else aus alpha beta funktion da raus?
         _, move = self.alpha_beta_search(game.board, self.name, 0, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move

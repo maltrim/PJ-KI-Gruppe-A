@@ -9,12 +9,12 @@ class AI:
         
     def determine_next_move(self):
         #_ , move = self.minMax_search(game.board,self.name, 3)
-        _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
+        _, move = self.alpha_beta_search(game.board, self.name, 0, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move
 
     #läuft die implementierung richtig?
-    def minMax_search(self, board, player, depth, turnBlue):
+    def minMax_search(self, board, player, depth, maxDepth, turnBlue):
         if depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
         
@@ -26,12 +26,12 @@ class AI:
             best_move = None
             for move in valid_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, -turnBlue)
-            if eval > max_eval:
-                max_eval = eval
-                #if depth == maxDepth dann untere Zeile ausfühen
-                best_move = move
-            self.undoMove()            
+                eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, maxDepth, False)
+                if eval > max_eval:
+                    max_eval = eval
+                    if depth == maxDepth:
+                        best_move = move
+                self.undoMove()            
             return max_eval, best_move
         
         else:
@@ -39,17 +39,17 @@ class AI:
             best_move = None
             for move in valid_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, turnBlue)
-            if eval < min_eval:
-                min_eval = eval
-                #if depth == maxDepth dann untere Zeile ausfühen
-                best_move = move
-            self.undoMove()   
+                eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, maxDepth, True)
+                if eval < min_eval:
+                    min_eval = eval
+                    if depth == maxDepth:
+                        best_move = move
+                self.undoMove()   
             return min_eval, best_move      
 
-    #TODO: find best move function in determine_next_move implementieren?
+    #TODO: find best move function der Move in determine_next_move implementieren?
 
-    def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player):
+    def alpha_beta_search(self, board, player, depth, maxDepth , alpha, beta, maximizing_player):
         if depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
 
@@ -60,29 +60,30 @@ class AI:
             best_move = None
             for move in valid_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, beta, alpha, -maximizing_player)
+                eval, _ = -self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
                 if eval > max_eval:
                     max_eval = eval
-                    #if depth == maxDepth dann untere Zeile ausfühen
-                    best_move = move
+                    if depth == maxDepth: #dann untere Zeile ausfühen
+                        best_move = move
                 alpha = max(alpha, eval)
-                if beta <= alpha:
+                if alpha >= beta:
                     break #cutoff also hier findet dieses pruning statt
             return max_eval, best_move
         #glaube ab else brauchen wir nicht?
-        else:
-            min_eval = math.inf
-            best_move = None
-            for move in valid_moves:
-                new_board = self.simulate_move(board, move)
-                eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, -beta, -alpha, maximizing_player)
-                if eval < min_eval:
-                    min_eval = eval
-                    best_move = move
-                alpha = max(alpha, eval)
-                if beta >= alpha:
-                    break #cutoff also hier findet dieses pruning statt
-            return min_eval, best_move
+        
+        #else:
+         #   min_eval = math.inf
+          #  best_move = None
+           # for move in valid_moves:
+            #    new_board = self.simulate_move(board, move)
+             #   eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth, maxDepth, alpha, beta, maximizing_player)
+              #  if eval < min_eval:
+               #     min_eval = eval
+                #    best_move = move
+                #alpha = max(alpha, eval)
+                #if beta >= alpha:
+                 #   break #cutoff also hier findet dieses pruning statt
+            #return min_eval, best_move
 
     #muss dass geändert werden?
     def simulate_move(self, board, move):

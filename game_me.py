@@ -12,7 +12,8 @@ class AI:
         _, move = self.alpha_beta_search(game.board, self.name, 3, -math.inf, math.inf, True)
         self.movelist.append(move)
         return move
-    
+
+    #läuft die implementierung richtig?
     def minMax_search(self, board, player, depth, turnBlue):
         if depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
@@ -28,6 +29,7 @@ class AI:
                 eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, -turnBlue)
             if eval > max_eval:
                 max_eval = eval
+                #if depth == maxDepth dann untere Zeile ausfühen
                 best_move = move
             self.undoMove()            
             return max_eval, best_move
@@ -40,9 +42,12 @@ class AI:
                 eval, _ = self.minMax_search(self, new_board, switch_player(player), depth - 1, turnBlue)
             if eval < min_eval:
                 min_eval = eval
+                #if depth == maxDepth dann untere Zeile ausfühen
                 best_move = move
             self.undoMove()   
             return min_eval, best_move      
+
+    #TODO: find best move function in determine_next_move implementieren?
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player):
         if depth == 0 or game.is_game_over():
@@ -58,11 +63,13 @@ class AI:
                 eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, beta, alpha, -maximizing_player)
                 if eval > max_eval:
                     max_eval = eval
+                    #if depth == maxDepth dann untere Zeile ausfühen
                     best_move = move
                 alpha = max(alpha, eval)
                 if beta <= alpha:
-                    break
+                    break #cutoff also hier findet dieses pruning statt
             return max_eval, best_move
+        #glaube ab else brauchen wir nicht?
         else:
             min_eval = math.inf
             best_move = None
@@ -74,15 +81,16 @@ class AI:
                     best_move = move
                 alpha = max(alpha, eval)
                 if beta >= alpha:
-                    break
+                    break #cutoff also hier findet dieses pruning statt
             return min_eval, best_move
 
-
+    #muss dass geändert werden?
     def simulate_move(self, board, move):
         new_board = [row[:] for row in board]  # Create a copy of the board
         new_board = make_move(new_board, move)
         return new_board
     
+    #TODO: bitte umschreiben
     def undoMove(self):
         if not self.moveHistory:
             return  # No move to undo

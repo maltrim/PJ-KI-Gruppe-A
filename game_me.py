@@ -58,20 +58,19 @@ class AI:
 
         valid_moves = get_move_list(board, player)
         valid_moves.pop(0) # Remove the count
-        if maximizing_player:
-            max_eval = -math.inf
-            best_move = None
-            for move in valid_moves:
-                new_board = self.simulate_move(board, move)
-                eval, _ = -self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
-                if eval > max_eval:
-                    max_eval = eval
-                    if depth == maxDepth: #dann untere Zeile ausfühen
-                        best_move = move
-                alpha = max(alpha, eval)
-                if alpha >= beta:
-                    break #cutoff also hier findet dieses pruning statt
-            return max_eval, best_move
+        max_eval = -math.inf
+        best_move = None
+        for move in valid_moves:
+            new_board = self.simulate_move(board, move)
+            eval, _ = -self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
+            if eval > max_eval:
+                max_eval = eval
+                if depth == maxDepth: #dann untere Zeile ausfühen
+                    best_move = move
+            alpha = max(alpha, eval)
+            if alpha >= beta:
+                break #cutoff also hier findet dieses pruning statt
+        return max_eval, best_move
         #glaube ab else brauchen wir nicht?
         
         #else:

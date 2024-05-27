@@ -375,6 +375,7 @@ def evaluate_board(board, player):
     back_rank_bonus = 100
     one_back_bevor_bonus = 50
     capture_bonus = 10
+    
 
     # Loop through the board to evaluate the positions
     for row in range(len(board)):

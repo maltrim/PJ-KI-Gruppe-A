@@ -4,13 +4,15 @@ from main import generate_gameboard2, get_move_list, switch_char2, switch_player
 
 class AI:
     turnBlue = True
+    moveHistory = []
+    maxDepth = 3
 
     def __init__(self, name):
         self.name = name # Farbe
         self.movelist = []
         
     def determine_next_move(self):
-        #_ , move = self.minMax_search(game.board,self.name, 3)
+        #_ , move = self.minMax_search(game.board,self.name, 3, self.maxDepth, 1 if self.turnBlue else -1)
         # müssen wir die funktion 2 mal aufrufen für rot und blau? und else aus alpha beta funktion da raus?
         #counter = 0
         _, move = self.alpha_beta_search(game.board, self.name, 3, 3, -math.inf, math.inf, 1 if self.turnBlue else -1)
@@ -21,14 +23,14 @@ class AI:
     #TODO: Funktion statt maxDepth fürs zeitliche festlegen? oder wie wollen wir es festelegen?
 
     #läuft die implementierung richtig?
-    def minMax_search(self, board, player, depth, maxDepth, turnBlue):
+    def minMax_search(self, board, player, depth, maxDepth, turnB):
         if depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
         
         valid_moves = get_move_list(board, player)
         valid_moves.pop(0) # Remove the count
         
-        if turnBlue:
+        if turnB:
             max_eval = -math.inf
             best_move = None
             for move in valid_moves:
@@ -66,9 +68,9 @@ class AI:
         best_move = None
         for move in valid_moves:
             new_board = self.simulate_move(board, move)
-            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, beta, alpha, -maximizing_player)
+            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
             if eval > max_eval:
-                max_eval = eval
+                max_eval = -eval
                 if depth == maxDepth: #dann untere Zeile ausfühen
                     best_move = move
             alpha = max(alpha, eval)
@@ -99,10 +101,10 @@ class AI:
     
     #TODO: bitte umschreiben
     def undoMove(self):
-        if not self.moveHistory:
+        if not self.movelist:
             return  # No move to undo
 
-        start, startCell, end, endCell = self.moveHistory.pop()
+        start, startCell, end, endCell = self.movelist.pop()
         startRow, startCol = int(start[1]) - 1, ord(start[0]) - 65
         endRow, endCol = int(end[1]) - 1, ord(end[0]) - 65
         self.gameBoard[startRow][startCol] = startCell

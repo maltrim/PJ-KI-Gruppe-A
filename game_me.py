@@ -3,6 +3,8 @@ import random
 from main import generate_gameboard2, get_move_list, switch_char2, switch_player, make_move, evaluate_board
 
 class AI:
+    turnBlue = True
+
     def __init__(self, name):
         self.name = name # Farbe
         self.movelist = []
@@ -10,7 +12,7 @@ class AI:
     def determine_next_move(self):
         #_ , move = self.minMax_search(game.board,self.name, 3)
         # müssen wir die funktion 2 mal aufrufen für rot und blau? und else aus alpha beta funktion da raus?
-        _, move = self.alpha_beta_search(game.board, self.name, 0, 3, -math.inf, math.inf, True)
+        _, move = self.alpha_beta_search(game.board, self.name, 3, 3, -math.inf, math.inf, 1 if self.turnBlue else 0)
         self.movelist.append(move)
         return move
     
@@ -54,7 +56,7 @@ class AI:
 
     def alpha_beta_search(self, board, player, depth, maxDepth , alpha, beta, maximizing_player):
         if depth == 0 or game.is_game_over():
-            return evaluate_board(board, player), None
+            return evaluate_board(board, player) * maximizing_player, None
 
         valid_moves = get_move_list(board, player)
         valid_moves.pop(0) # Remove the count
@@ -62,7 +64,7 @@ class AI:
         best_move = None
         for move in valid_moves:
             new_board = self.simulate_move(board, move)
-            eval, _ = -self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
+            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
             if eval > max_eval:
                 max_eval = eval
                 if depth == maxDepth: #dann untere Zeile ausfühen

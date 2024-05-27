@@ -5,7 +5,6 @@ from main import generate_gameboard2, get_move_list, switch_char2, switch_player
 class AI:
     turnBlue = True
     moveHistory = []
-    maxDepth = 3
 
     def __init__(self, name):
         self.name = name # Farbe

@@ -351,7 +351,7 @@ def make_move(board, move):
         elif start_val == 'rb' or start_val == 'br':
             update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
     else:
-        if (start_val, end_val) in [('r', 'r'), ('b', 'b')]:
+        if (start_val, end_val) in [('r', 'r'), ('b', 'b'), ('b', 'br'), ('r', 'rb')]:
             update_board((start_x, start_y), (end_x, end_y), '', start_val * 2)
         elif (start_val, end_val) in [('r', 'b'), ('b', 'r')]:
             update_board((start_x, start_y), (end_x, end_y), '', start_val + end_val)

@@ -373,6 +373,7 @@ def evaluate_board(board, player):
     
     # Define the importance of reaching the opponent's back rank
     back_rank_bonus = 100
+    one_back_bevor_bonus = 50
     capture_bonus = 10
 
     # Loop through the board to evaluate the positions
@@ -392,23 +393,28 @@ def evaluate_board(board, player):
                 score += mixed_double_value if player == 'b' else -mixed_double_value
             
             # Check if a piece has reached the opponent's back rank
-            if piece in ['b', 'bb'] and row == len(board) - 1 and player == 'b':
+            if piece in ['b', 'bb', 'rb'] and row == len(board) - 1 and player == 'b':
                 score += back_rank_bonus
-            elif piece in ['r', 'rr'] and row == 0 and player == 'r':
+            elif piece in ['r', 'rr', 'br'] and row == 0 and player == 'r':
                 score += back_rank_bonus
+
+            if piece in ['b', 'bb', 'rb'] and row == len(board) - 2 and player == 'b':
+                score += one_back_bevor_bonus
+            elif piece in ['r', 'rr', 'br'] and row == 1 and player == 'r':
+                score += one_back_bevor_bonus
 
     for row in range(len(board)):
         for col in range(len(board[row])):
             piece = board[row][col]
             if piece in ['b', 'bb', 'rb'] and player == 'b':
                 # Check for captures by 'b' player
-                if (row > 1 and col > 1 and board[row-1][col-1] in ['r', 'rr'] and board[row-2][col-2] == 'e') or \
-                   (row > 1 and col < len(board[row]) - 2 and board[row-1][col+1] in ['r', 'rr'] and board[row-2][col+2] == 'e'):
+                if (row > 1 and col > 1 and board[row-1][col-1] in ['r', 'rr', 'br'] and board[row-2][col-2] == 'e') or \
+                   (row > 1 and col < len(board[row]) - 2 and board[row-1][col+1] in ['r', 'rr', 'br'] and board[row-2][col+2] == 'e'):
                     score += capture_bonus
             elif piece in ['r', 'rr', 'br'] and player == 'r':
                 # Check for captures by 'r' player
-                if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb'] and board[row+2][col-2] == 'e') or \
-                   (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb'] and board[row+2][col+2] == 'e'):
+                if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb', 'rb'] and board[row+2][col-2] == 'e') or \
+                   (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb', 'rb'] and board[row+2][col+2] == 'e'):
                     score += capture_bonus
     # Use get_move_list to get all possible moves for the current player
     #possible_moves = get_move_list(board, player)

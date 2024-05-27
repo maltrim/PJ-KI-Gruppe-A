@@ -12,8 +12,10 @@ class AI:
     def determine_next_move(self):
         #_ , move = self.minMax_search(game.board,self.name, 3)
         # müssen wir die funktion 2 mal aufrufen für rot und blau? und else aus alpha beta funktion da raus?
-        _, move = self.alpha_beta_search(game.board, self.name, 3, 3, -math.inf, math.inf, 1 if self.turnBlue else 0)
+        #counter = 0
+        _, move = self.alpha_beta_search(game.board, self.name, 3, 3, -math.inf, math.inf, 1 if self.turnBlue else -1)
         self.movelist.append(move)
+        #print(counter)
         return move
     
     #TODO: Funktion statt maxDepth fürs zeitliche festlegen? oder wie wollen wir es festelegen?
@@ -64,7 +66,7 @@ class AI:
         best_move = None
         for move in valid_moves:
             new_board = self.simulate_move(board, move)
-            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, -beta, -alpha, -maximizing_player)
+            eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth -1, maxDepth, beta, alpha, -maximizing_player)
             if eval > max_eval:
                 max_eval = eval
                 if depth == maxDepth: #dann untere Zeile ausfühen

@@ -150,6 +150,8 @@ class Game:
                 update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
             elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
                 update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
+            elif (start_val, end_val) in [('b', 'br'), ('r', 'rb')]:
+                update_board((start_x, start_y), (end_x, end_y), '', end_val[0] + start_val)
             
     def is_game_over(self):
         gameboard = self.board

@@ -27,7 +27,6 @@ def main():
     for fen_str, turn in zip(positions, turns):
         print(f"Testing FEN: {fen_str}")
         for depth in depths:
-            start_time = time.time()
             move, duration, nodes_searched = benchmark(fen_str, depth, turn)
             print(f"Depth: {depth}, Move: {move}, Duration: {duration}s, Nodes Searched: {nodes_searched}")
 

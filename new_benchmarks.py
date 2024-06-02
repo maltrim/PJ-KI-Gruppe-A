@@ -12,11 +12,11 @@ def main():
     objGame = Game(objB, objR)
 
     execution_times = []
-    
+
     execution_times_start = []
-  
+
     objGame.board = generate_gameboard(fen_str_start)
-  
+
     for _ in range(1000):
         start_time = time.time()
         score = evaluate_board(objGame.board, 'b')
@@ -26,11 +26,11 @@ def main():
 
     average_execution_time_start = sum(execution_times_start) / len(execution_times_start)
     execution_times.append(average_execution_time_start)
-    
+
     execution_times_mid = []
-  
+
     objGame.board = generate_gameboard(fen_str_mid)
-    
+
     for _ in range(1000):
         start_time = time.time()
         score = evaluate_board(objGame.board, 'r')
@@ -42,9 +42,9 @@ def main():
     execution_times.append(average_execution_time_mid)
 
     execution_times_end = []
-    
+
     objGame.board = generate_gameboard(fen_str_end)
-    
+
     for _ in range(1000):
         start_time = time.time()
         score = evaluate_board(objGame.board, 'b')
@@ -54,6 +54,9 @@ def main():
 
     average_execution_time_end = sum(execution_times_end) / len(execution_times_end)
     execution_times.append(average_execution_time_end)
-    
+
 
     return execution_times
+
+t = main()
+print(t)

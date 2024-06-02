@@ -2,7 +2,7 @@ import unittest
 import math
 from unittest.mock import patch
 from main import *
-from game import *
+from Game.game import *
 
 class TestMain(unittest.TestCase):
 

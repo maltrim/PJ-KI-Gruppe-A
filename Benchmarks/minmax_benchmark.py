@@ -1,5 +1,5 @@
 import time
-from game_xd_2 import AI, Game
+from Game.game_xd_2 import AI, Game
 from main import generate_gameboard
 
 fen_str_start = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'

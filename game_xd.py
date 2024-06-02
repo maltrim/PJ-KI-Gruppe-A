@@ -18,12 +18,12 @@ class AI:
         # If no move is found, use random move
         move_list = get_move_list(game.board, self.name)
         move_list.pop(0)
-        move = random.choice(move_list)
-        
+        if move_list:
+            best_move = random.choice(move_list)
+
         while time.time() - start_time < self.time_limit:
             score, move = self.alpha_beta_search(game.board, self.name, depth, -math.inf, math.inf, True, start_time)
             if time.time() - start_time >= self.time_limit:
-                
                 break
             if score > best_score:
                 best_score = score
@@ -34,16 +34,15 @@ class AI:
         return best_move
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player, start_time):
-        valid_moves = get_move_list(board, player)
-        valid_moves.pop(0) # remove count
-        move = random.choice(valid_moves)
-        
-        if not valid_moves or depth == 0 or game.is_game_over():
+        if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
-        if time.time() - start_time >= self.time_limit:
-            return evaluate_board(board, player), move
 
-        best_move = None
+        valid_moves = get_move_list(board, player)
+        if not valid_moves or len(valid_moves) == 1:
+            return evaluate_board(board, player), None
+
+        valid_moves.pop(0)  # Remove the count
+        best_move = random.choice(valid_moves)  # Default move if no better move is found
 
         if maximizing_player:
             max_eval = -math.inf
@@ -52,8 +51,7 @@ class AI:
                 eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, False, start_time)
                 if eval > max_eval:
                     max_eval = eval
-                    if depth == 1:  # Save best move only at the first depth level
-                        best_move = move
+                    best_move = move
                 alpha = max(alpha, eval)
                 if alpha >= beta:
                     break  # cutoff
@@ -65,8 +63,7 @@ class AI:
                 eval, _ = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, True, start_time)
                 if eval < min_eval:
                     min_eval = eval
-                    if depth == 1:  # Save best move only at the first depth level
-                        best_move = move
+                    best_move = move
                 beta = min(beta, eval)
                 if alpha >= beta:
                     break  # cutoff

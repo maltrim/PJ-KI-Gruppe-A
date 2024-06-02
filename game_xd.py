@@ -145,16 +145,6 @@ class AI:
         new_board = make_move(new_board, move)
         return new_board
 
-    def undo_move(self):
-        if not self.movelist:
-            return  # No move to undo
-
-        start, start_cell, end, end_cell = self.movelist.pop()
-        start_row, start_col = int(start[1]) - 1, ord(start[0]) - 65
-        end_row, end_col = int(end[1]) - 1, ord(end[0]) - 65
-        game.board[start_row][start_col] = start_cell
-        game.board[end_row][end_col] = end_cell
-
 class Game:
     def __init__(self, p1, p2):
         self.board = generate_gameboard2()

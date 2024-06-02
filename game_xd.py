@@ -43,6 +43,66 @@ class AI:
 
         self.movelist.append(best_move)
         return best_move
+    
+    def determine_next_move_mm(self):
+        best_move = None
+        best_score = -math.inf
+        start_time = time.time()
+        depth = 1
+
+        # If no move is found, use random move
+        move_list = get_move_list(game.board, self.name)
+        move_list.pop(0)
+        if move_list:
+            best_move = random.choice(move_list)
+
+        while time.time() - start_time < self.time_limit:
+            score, move = self.minimax_search(game.board, self.name, depth, True, start_time)
+            if time.time() - start_time >= self.time_limit:
+                break
+            if score > best_score:
+                best_score = score
+                best_move = move
+            depth += 1
+
+        # Check for repeated moves
+        if len(self.movelist) > 2 and self.movelist[-2] == best_move:
+            valid_moves = get_move_list(game.board, self.name)
+            valid_moves.pop(0)
+            best_move = random.choice(valid_moves)
+
+        self.movelist.append(best_move)
+        return best_move
+
+    def minimax_search(self, board, player, depth, maximizing_player, start_time):
+        if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
+            return evaluate_board(board, player), None
+
+        valid_moves = get_move_list(board, player)
+        if not valid_moves or len(valid_moves) == 1:
+            return evaluate_board(board, player), None
+
+        valid_moves.pop(0)  # Remove the count
+        best_move = random.choice(valid_moves)  # Default move if no better move is found
+
+        if maximizing_player:
+            max_eval = -math.inf
+            for move in valid_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ = self.minimax_search(new_board, switch_player(player), depth - 1, False, start_time)
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+            return max_eval, best_move
+        else:
+            min_eval = math.inf
+            for move in valid_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ = self.minimax_search(new_board, switch_player(player), depth - 1, True, start_time)
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+            return min_eval, best_move
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player, start_time):
         if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
@@ -192,7 +252,7 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move = current_player.determine_next_move_abs()
+            next_move = current_player.determine_next_move_mm()
             print(current_player.name)
             print(next_move)
             self.make_move(next_move)

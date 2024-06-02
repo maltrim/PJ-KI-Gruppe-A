@@ -23,6 +23,7 @@ class AI:
         while time.time() - start_time < self.time_limit:
             score, move = self.alpha_beta_search(game.board, self.name, depth, -math.inf, math.inf, True, start_time)
             if time.time() - start_time >= self.time_limit:
+                
                 break
             if score > best_score:
                 best_score = score
@@ -33,14 +34,15 @@ class AI:
         return best_move
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player, start_time):
-        if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
-            return evaluate_board(board, player), None
-
         valid_moves = get_move_list(board, player)
-        if not valid_moves:
+        valid_moves.pop(0) # remove count
+        move = random.choice(valid_moves)
+        
+        if not valid_moves or depth == 0 or game.is_game_over():
             return evaluate_board(board, player), None
+        if time.time() - start_time >= self.time_limit:
+            return evaluate_board(board, player), move
 
-        valid_moves.pop(0)  # Remove the count
         best_move = None
 
         if maximizing_player:

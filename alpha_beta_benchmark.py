@@ -1,0 +1,12 @@
+import time
+from main import generate_gameboard
+from game import AI, Game
+
+fen_str_start = 'b0b0b0b0b0b0/1b0b0b0b0b0b01/8/8/8/8/1r0r0r0r0r0r01/r0r0r0r0r0r0 b'
+fen_str_mid = 'b01bbb01b0/1b02b03/3bbr01b01/8/3rr1b0b01/8/2r01r01rr1/r0r0r01r01 r'
+fen_str_end = '2b02bb/1bb2b03/5bb2/8/1r03r02/6r01/8/r01r01rrr0 b'
+
+def main():
+  objB = AI('b')
+  objR = AI('r')
+  objGame = Game(objB, objR)

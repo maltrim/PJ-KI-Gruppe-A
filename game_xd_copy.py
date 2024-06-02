@@ -56,7 +56,7 @@ class AI:
 
         for depth in range(1, max_depth + 1):
             start_time = time.time()
-            score, move, nodes = self.minimax_search(game.board, turn, depth, True, total_start_time)
+            score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
 

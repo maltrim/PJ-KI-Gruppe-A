@@ -373,9 +373,9 @@ def evaluate_board(board, player):
     
     # Define the importance of reaching the opponent's back rank
     back_rank_bonus = 100
-    one_back_bevor_bonus = 50
+    one_back_before_bonus = 50
     capture_bonus = 10
-    
+    advance_bonus = 5  # Bonus for advancing forward
 
     # Loop through the board to evaluate the positions
     for row in range(len(board)):
@@ -384,14 +384,19 @@ def evaluate_board(board, player):
             
             if piece == 'b':
                 score += single_value if player == 'b' else -single_value
+                score += advance_bonus * row if player == 'b' else -advance_bonus * row
             elif piece == 'r':
                 score += single_value if player == 'r' else -single_value
+                score += advance_bonus * (len(board) - 1 - row) if player == 'r' else -advance_bonus * (len(board) - 1 - row)
             elif piece == 'bb':
                 score += double_value if player == 'b' else -double_value
+                score += advance_bonus * row if player == 'b' else -advance_bonus * row
             elif piece == 'rr':
                 score += double_value if player == 'r' else -double_value
+                score += advance_bonus * (len(board) - 1 - row) if player == 'r' else -advance_bonus * (len(board) - 1 - row)
             elif piece == 'br' or piece == 'rb':
                 score += mixed_double_value if player == 'b' else -mixed_double_value
+                score += advance_bonus * row if player == 'b' else -advance_bonus * row
             
             # Check if a piece has reached the opponent's back rank
             if piece in ['b', 'bb', 'rb'] and row == len(board) - 1 and player == 'b':
@@ -400,9 +405,9 @@ def evaluate_board(board, player):
                 score += back_rank_bonus
 
             if piece in ['b', 'bb', 'rb'] and row == len(board) - 2 and player == 'b':
-                score += one_back_bevor_bonus
+                score += one_back_before_bonus
             elif piece in ['r', 'rr', 'br'] and row == 1 and player == 'r':
-                score += one_back_bevor_bonus
+                score += one_back_before_bonus
 
     for row in range(len(board)):
         for col in range(len(board[row])):
@@ -417,17 +422,9 @@ def evaluate_board(board, player):
                 if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb', 'rb'] and board[row+2][col-2] == 'e') or \
                    (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb', 'rb'] and board[row+2][col+2] == 'e'):
                     score += capture_bonus
-    # Use get_move_list to get all possible moves for the current player
-    #possible_moves = get_move_list(board, player)
-    #
-    #for move in possible_moves:
-    #    new_board = make_move(board, move)
-    #    move_score = evaluate_board(new_board, player)
-    #    
-    #    # Adjust score based on the future board state
-    #    score += move_score / len(possible_moves)  # Average the potential outcomes
 
     return score
+
 
 def count_pieces(board, turn):
     count = 0

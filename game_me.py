@@ -138,7 +138,7 @@ class Game:
             if start_val == 'b' or start_val == 'r':
                 update_board((start_x, start_y), (end_x, end_y), '', start_val)
             elif start_val == 'rr' or start_val == 'bb':
-                update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0])
+                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
             elif start_val == 'rb' or start_val == 'br':
                 update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1])
         else:
@@ -149,9 +149,11 @@ class Game:
             elif (start_val, end_val) in [('rr', 'b'), ('rb', 'r'), ('br', 'b'), ('bb', 'r')]:
                 update_board((start_x, start_y), (end_x, end_y), start_val[1], start_val[0] + end_val)
             elif (start_val, end_val) in [('rr', 'r'), ('br', 'r'), ('bb', 'b'), ('rb', 'b')]:
-                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val + end_val)
-            elif (start_val, end_val) in [('b', 'br'), ('r', 'rb')]:
+                update_board((start_x, start_y), (end_x, end_y), start_val[0], start_val[1] + end_val)
+            elif (start_val, end_val) in [('b', 'br'), ('r', 'rb'), ('b', 'rr'), ('r', 'bb')]:
                 update_board((start_x, start_y), (end_x, end_y), '', end_val[0] + start_val)
+            elif (start_val, end_val) in [('bb', 'br'), ('rr', 'rb')]:
+                update_board((start_x, start_y), (end_x, end_y), start_val[0], end_val[0] + start_val[1])
             
     def is_game_over(self):
         gameboard = self.board

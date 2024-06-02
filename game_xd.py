@@ -7,9 +7,14 @@ class AI:
     def __init__(self, name):
         self.name = name  # Farbe
         self.movelist = []
-        self.time_limit = 5.0  # Zeitlimit für die Suche in Sekunden
+        self.time_limit = 2.0  # Zeitlimit für die Suche in Sekunden
 
-    def determine_next_move(self):
+    def determine_next_move_random(self):
+        move_list = get_move_list(game.board, self.name)
+        move_list.pop(0)
+        return random.choice(move_list)
+
+    def determine_next_move_abs(self):
         best_move = None
         best_score = -math.inf
         start_time = time.time()
@@ -29,6 +34,12 @@ class AI:
                 best_score = score
                 best_move = move
             depth += 1
+            
+        # Check for repeated moves
+        if len(self.movelist) > 2 and self.movelist[-2] == best_move and self.movelist[-4] == best_move:
+            valid_moves = get_move_list(game.board, self.name)
+            valid_moves.pop(0)
+            best_move = random.choice(valid_moves)
 
         self.movelist.append(best_move)
         return best_move
@@ -181,7 +192,7 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move = current_player.determine_next_move()
+            next_move = current_player.determine_next_move_abs()
             print(current_player.name)
             print(next_move)
             self.make_move(next_move)

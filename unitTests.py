@@ -58,33 +58,40 @@ class TestMain(unittest.TestCase):
         expected = True
     
     def test_alpha_beta_search(self, mock_get_move_list, mock_evaluate_board):
-        # Mock the functions
         mock_evaluate_board.side_effect = lambda board, player: 1 if player == 'X' else -1
         mock_get_move_list.side_effect = lambda board, player: [3, 'move1', 'move2'] if player == 'X' else [3, 'move3', 'move4']
 
-        # Example board state
-        board = [['', '', ''],
-                 ['', '', ''],
-                 ['', '', '']]
+        board =[
+            [None, '', '', '', '', '', '', None],
+            ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', 'b', 'bb', '', '', ''],
+                ['', 'r', '', '', '', '', '', ''],
+            ['', 'b', '', '', '', 'rr', '', ''],
+            [None, '', '', '', 'r', '', '', None]
+            ]    
 
-        # Call alpha_beta_search
         score, move = self.ai.alpha_beta_search(board, 'X', 3, 3, -math.inf, math.inf, 1)
         
-        # Validate the results
         self.assertEqual(score, 1)
         self.assertIn(move, ['move1', 'move2'])
 
     def test_alpha_beta_search_game_over(self, mock_get_move_list, mock_evaluate_board):
-        # Mock the functions
         mock_evaluate_board.side_effect = lambda board, player: 1 if player == 'X' else -1
         mock_get_move_list.side_effect = lambda board, player: [0]  # No moves, game over
 
-        # Example board state
-        board = [['', '', ''],
-                 ['', '', ''],
-                 ['', '', '']]
+        board =[
+            [None, '', '', '', 'b', 'b', 'b', None],
+            ['', '', '', '', '', '', '', ''],
+                ['', 'rr', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', 'b', 'bb', '', '', ''],
+                ['', 'r', '', '', '', '', '', ''],
+            ['', '', '', '', '', 'rr', '', ''],
+            [None, 'r', '', '', 'r', '', '', None]
+            ]    
 
-        # Simulate game over
         with patch.object(game, 'is_game_over', return_value=True):
             score, move = self.ai.alpha_beta_search(board, 'X', 3, 3, -math.inf, math.inf, 1)
         
@@ -97,10 +104,16 @@ class TestMain(unittest.TestCase):
         mock_evaluate_board.side_effect = lambda board, player: 1 if player == 'X' else -1
         mock_get_move_list.side_effect = lambda board, player: [3, 'move1', 'move2']
 
-        # Example board state
-        board = [['', '', ''],
-                 ['', '', ''],
-                 ['', '', '']]
+        board =[
+            [None, '', '', '', '', 'b', 'b', None],
+            ['', '', '', '', '', '', '', 'b'],
+                ['', 'bb', '', '', 'r', 'rr', '', ''],
+                ['', 'r', '', '', '', '', '', ''],
+                ['', 'b', '', 'b', 'bb', '', '', ''],
+                ['', 'r', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            [None, 'r', '', '', 'r', '', '', None]
+            ]    
 
         # Call alpha_beta_search with depth 0
         score, move = self.ai.alpha_beta_search(board, 'X', 0, 3, -math.inf, math.inf, 1)

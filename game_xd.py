@@ -36,7 +36,7 @@ class AI:
             depth += 1
             
         # Check for repeated moves
-        if len(self.movelist) > 2 and self.movelist[-2] == best_move and self.movelist[-4] == best_move:
+        if len(self.movelist) > 2 and self.movelist[-2] == best_move:
             valid_moves = get_move_list(game.board, self.name)
             valid_moves.pop(0)
             best_move = random.choice(valid_moves)

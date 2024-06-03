@@ -134,7 +134,8 @@ class AI:
             if eval > max_eval:
                 max_eval = eval
                 best_move = move
-            alpha = max(alpha, eval)
+            if alpha < max_eval:
+                alpha = max_eval 
             if alpha >= beta:
                 break  # cutoff
         return max_eval, best_move, nodes_searched

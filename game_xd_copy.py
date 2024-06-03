@@ -5,7 +5,6 @@ from main import generate_gameboard2, get_move_list, switch_char2, switch_player
 
 class AI:
     turnB = True
-    moveHistory = []
 
     def __init__(self, name):
         self.name = name  # Farbe
@@ -102,7 +101,6 @@ class AI:
                 if eval > max_eval:
                     max_eval = eval
                     best_move = move
-                self.undoMove()
             return max_eval, best_move, nodes_searched
         else:
             min_eval = math.inf
@@ -113,19 +111,7 @@ class AI:
                 if eval < min_eval:
                     min_eval = eval
                     best_move = move
-                self.undoMove()
             return min_eval, best_move, nodes_searched
-        
-    def undoMove(self):
-        if not self.moveHistory:
-            return  # No move to undo
-        
-        start, startCell, end, endCell = self.moveHistory.pop()
-        startRow, startCol = int(start[1]) - 1, ord(start[0]) - 65
-        endRow, endCol = int(end[1]) - 1, ord(end[0]) - 65
-
-        self.gameBoard[startRow][startCol] = startCell
-        self.gameBoard[endRow][endCol] = endCell
 
 
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player, start_time):

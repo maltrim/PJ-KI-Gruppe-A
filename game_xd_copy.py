@@ -203,7 +203,7 @@ class AI:
             eval, _, nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
             nodes_searched += nodes
             if eval > max_eval:
-                max_eval = -eval
+                max_eval = eval
                 best_move = move
         return max_eval, best_move, nodes_searched
 

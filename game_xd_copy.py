@@ -149,6 +149,29 @@ class AI:
         new_board = [row[:] for row in board]  # Create a copy of the board
         new_board = make_move(new_board, move)
         return new_board
+    
+    def negaMax(self, board, player, depth, maximizing_player, start_time):
+        nodes_searched = 1
+        if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
+            return evaluate_board(board, player) * maximizing_player, None, nodes_searched
+        
+        valid_moves = get_move_list(board, player)
+        if not valid_moves or len(valid_moves) == 1:
+            return evaluate_board(board, player), None, nodes_searched
+        
+        valid_moves.pop(0)  # Remove the count
+        best_move = None
+
+        max_eval = -math.inf
+        for move in valid_moves:
+            new_board = self.simulate_move(board, move)
+            eval, _, nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
+            nodes_searched += nodes
+            if eval > max_eval:
+                max_eval = -eval
+                best_move = move
+        return max_eval, best_move, nodes_searched
+
 
 class Game:
     def __init__(self, p1, p2):

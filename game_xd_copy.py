@@ -200,7 +200,7 @@ class AI:
         max_eval = -math.inf
         for move in valid_moves:
             new_board = self.simulate_move(board, move)
-            eval, _, nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
+            eval, _, nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
             nodes_searched += nodes
             if eval > max_eval:
                 max_eval = -eval
@@ -304,7 +304,7 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move, _ = current_player.determine_next_move_abs(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
+            next_move, _ = current_player.determine_next_move_nm(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
             print(current_player.name)
             print(next_move)
             self.make_move(next_move)

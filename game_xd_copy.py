@@ -51,6 +51,41 @@ class AI:
 
         self.movelist.append(best_move)
         return best_move, total_nodes_searched
+    
+    def determine_next_move_nm(self, max_depth, turn):
+        best_move = None
+        best_score = -math.inf
+        total_nodes_searched = 0
+        total_start_time = time.time()
+        remaining_time = self.initial_time_limit
+
+        for depth in range(1, max_depth + 1):
+            start_time = time.time()
+            # Berechne das Zeitlimit für die aktuelle Tiefe
+            depth_time_limit = remaining_time / (max_depth - depth + 1)
+            self.time_limit = depth_time_limit
+
+            score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
+            total_nodes_searched += nodes
+            duration = time.time() - start_time
+            remaining_time -= duration
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+            print(f"Depth: {depth}, Best Score: {best_score}, Best Move: {best_move}, Nodes Searched: {total_nodes_searched}, Time: {duration}s")
+
+            if remaining_time <= 0:
+                break
+
+        if len(self.movelist) > 2 and self.movelist[-2] == best_move:
+            valid_moves = get_move_list(game.board, turn)
+            valid_moves.pop(0)
+            best_move = random.choice(valid_moves)
+
+        self.movelist.append(best_move)
+        return best_move, total_nodes_searched
 
     def determine_next_move_mm(self, max_depth, turn):
         best_move = None

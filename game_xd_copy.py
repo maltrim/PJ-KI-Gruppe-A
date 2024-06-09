@@ -9,7 +9,8 @@ class AI:
     def __init__(self, name):
         self.name = name  # Farbe
         self.movelist = []
-        self.time_limit = 100.0  # Zeitlimit für die Suche in Sekunden
+        self.time_limit = 2.0  # Zeitlimit für die Suche in Sekunden
+        self.initial_time_limit = 10.0  # Ein initiales Zeitlimit für die gesamte Berechnung
 
     def determine_next_move_random(self):
         move_list = get_move_list(game.board, self.name)
@@ -21,12 +22,18 @@ class AI:
         best_score = -math.inf
         total_nodes_searched = 0
         total_start_time = time.time()
+        remaining_time = self.initial_time_limit
 
         for depth in range(1, max_depth + 1):
             start_time = time.time()
+            # Berechne das Zeitlimit für die aktuelle Tiefe
+            depth_time_limit = remaining_time / (max_depth - depth + 1)
+            self.time_limit = depth_time_limit
+
             score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
+            remaining_time -= duration
 
             if score > best_score:
                 best_score = score
@@ -34,11 +41,9 @@ class AI:
 
             print(f"Depth: {depth}, Best Score: {best_score}, Best Move: {best_move}, Nodes Searched: {total_nodes_searched}, Time: {duration}s")
 
-            # If the total elapsed time exceeds the time limit, break the loop
-            if time.time() - total_start_time >= self.time_limit:
+            if remaining_time <= 0:
                 break
 
-        # Check for repeated moves
         if len(self.movelist) > 2 and self.movelist[-2] == best_move:
             valid_moves = get_move_list(game.board, turn)
             valid_moves.pop(0)
@@ -47,18 +52,22 @@ class AI:
         self.movelist.append(best_move)
         return best_move, total_nodes_searched
 
-    
     def determine_next_move_mm(self, max_depth, turn):
         best_move = None
         best_score = -math.inf
         total_nodes_searched = 0
         total_start_time = time.time()
+        remaining_time = self.initial_time_limit
 
         for depth in range(1, max_depth + 1):
             start_time = time.time()
+            depth_time_limit = remaining_time / (max_depth - depth + 1)
+            self.time_limit = depth_time_limit
+
             score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
+            remaining_time -= duration
 
             if score > best_score:
                 best_score = score
@@ -66,19 +75,16 @@ class AI:
 
             print(f"Depth: {depth}, Best Score: {best_score}, Best Move: {best_move}, Nodes Searched: {total_nodes_searched}, Time: {duration}s")
 
-            # If the total elapsed time exceeds the time limit, break the loop
-            if time.time() - total_start_time >= self.time_limit:
+            if remaining_time <= 0:
                 break
 
-        # Check for repeated moves
-        if len(self.movelist) > 2 and self.movelist[-2] == best_move:
+        if len(self.movelist) > 2 & self.movelist[-2] == best_move:
             valid_moves = get_move_list(game.board, turn)
             valid_moves.pop(0)
             best_move = random.choice(valid_moves)
 
         self.movelist.append(best_move)
         return best_move, total_nodes_searched
-
 
     def minimax_search(self, board, player, depth, maximizing_player, start_time):
         nodes_searched = 1
@@ -113,7 +119,6 @@ class AI:
                     best_move = move
             return min_eval, best_move, nodes_searched
 
-
     def alpha_beta_search(self, board, player, depth, alpha, beta, maximizing_player, start_time):
         nodes_searched = 1
         if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
@@ -139,7 +144,6 @@ class AI:
             if alpha >= beta:
                 break  # cutoff
         return max_eval, best_move, nodes_searched
-
 
     def simulate_move(self, board, move):
         new_board = [row[:] for row in board]  # Create a copy of the board
@@ -193,7 +197,6 @@ class Game:
                 update_board((start_x, start_y), (end_x, end_y), '', end_val[0] + start_val)
             elif (start_val, end_val) in [('bb', 'br'), ('rr', 'rb'), ('br', 'bb'), ('rb', 'rr')]:
                 update_board((start_x, start_y), (end_x, end_y), start_val[0], end_val[0] + start_val[1])
-            
 
     def is_game_over(self):
         gameboard = self.board
@@ -243,7 +246,7 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move, _ = current_player.determine_next_move_abs(4, current_player.name) # hier minimax, alpha beta oder random auswählen
+            next_move, _ = current_player.determine_next_move_abs(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
             print(current_player.name)
             print(next_move)
             self.make_move(next_move)

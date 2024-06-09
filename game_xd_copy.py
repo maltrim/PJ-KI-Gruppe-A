@@ -10,7 +10,7 @@ class AI:
         self.name = name  # Farbe
         self.movelist = []
         self.time_limit = 2.0  # Zeitlimit für die Suche in Sekunden
-        self.initial_time_limit = 10.0  # Ein initiales Zeitlimit für die gesamte Berechnung
+        self.initial_time_limit = 5.0  # Ein initiales Zeitlimit für die gesamte Berechnung
 
     def determine_next_move_random(self):
         move_list = get_move_list(game.board, self.name)
@@ -202,8 +202,9 @@ class AI:
             new_board = self.simulate_move(board, move)
             eval, _, nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
             nodes_searched += nodes
+            eval = -eval  # Negate the evaluation for NegaMax
             if eval > max_eval:
-                max_eval = -eval
+                max_eval = eval
                 best_move = move
         return max_eval, best_move, nodes_searched
 

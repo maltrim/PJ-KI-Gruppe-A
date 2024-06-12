@@ -132,12 +132,13 @@ class AI:
 
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = self.order_moves(board, valid_moves, player)
 
         if maximizing_player:
             max_eval = -math.inf
-            for move in valid_moves:
+            for move in ordered_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _, nodes = self.minimax_search(new_board, switch_player(player), depth - 1, False, start_time)
+                eval, _ , nodes = self.minimax_search(new_board, switch_player(player), depth - 1, False, start_time)
                 nodes_searched += nodes
                 if eval > max_eval:
                     max_eval = eval
@@ -145,9 +146,9 @@ class AI:
             return max_eval, best_move, nodes_searched
         else:
             min_eval = math.inf
-            for move in valid_moves:
+            for move in ordered_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _, nodes = self.minimax_search(new_board, switch_player(player), depth - 1, True, start_time)
+                eval, _ , nodes = self.minimax_search(new_board, switch_player(player), depth - 1, True, start_time)
                 nodes_searched += nodes
                 if eval < min_eval:
                     min_eval = eval
@@ -165,26 +166,53 @@ class AI:
 
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = self.order_moves(board, valid_moves, player)
 
-        max_eval = -math.inf
-        for move in valid_moves:
-            new_board = self.simulate_move(board, move)
-            eval, _, nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, -beta, -alpha, -maximizing_player, start_time)
-            nodes_searched += nodes
-            eval = -eval
-            if eval > max_eval:
-                max_eval = eval
-                best_move = move
-            if alpha < max_eval:
-                alpha = max_eval 
-            if alpha >= beta:
-                break  # cutoff
-        return max_eval, best_move, nodes_searched
+        if maximizing_player == 1:
+            max_eval = -math.inf
+            for move in ordered_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ , nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, -maximizing_player, start_time)
+                nodes_searched += nodes
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+                alpha = max(alpha, eval)
+                if alpha >= beta:
+                    break  # alpha-beta cutoff
+            return max_eval, best_move, nodes_searched
+        else:
+            min_eval = math.inf
+            for move in ordered_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _ , nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, alpha, beta, -maximizing_player, start_time)
+                nodes_searched += nodes
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+                beta = min(beta, eval)
+                if alpha >= beta:
+                    break  # alpha-beta cutoff
+            return min_eval, best_move, nodes_searched
 
     def simulate_move(self, board, move):
         new_board = [row[:] for row in board]  # Create a copy of the board
         new_board = make_move(new_board, move)
         return new_board
+    
+    def order_moves(self, board, moves, player):
+        move_scores = []
+
+        for move in moves:
+            new_board = self.simulate_move(board, move)
+            move_score = evaluate_board(new_board, player)
+            move_scores.append((move_score, move))
+
+        # Sort moves based on their heuristic score in descending order
+        move_scores.sort(reverse=True, key=lambda x: x[0])
+        ordered_moves = [move for _, move in move_scores]
+
+        return ordered_moves
     
     def negaMax(self, board, player, depth, maximizing_player, start_time):
         nodes_searched = 1
@@ -197,13 +225,14 @@ class AI:
         
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = self.order_moves(board, valid_moves, player)
 
         max_eval = -math.inf
-        for move in valid_moves:
+        for move in ordered_moves:
             new_board = self.simulate_move(board, move)
-            eval, _, nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
+            eval, _ , nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
             nodes_searched += nodes
-            eval = -eval  # Negate the evaluation for NegaMax
+            eval = -eval  # Negate the evaluation after the recursion for NegaMax
             if eval > max_eval:
                 max_eval = eval
                 best_move = move

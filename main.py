@@ -424,6 +424,29 @@ def evaluate_board(board, player):
                 if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb', 'rb'] and board[row+2][col-2] == 'e') or \
                    (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb', 'rb'] and board[row+2][col+2] == 'e'):
                     score += capture_bonus
+    
+
+    # Heuristic weights
+    piece_values = {'b': 1, 'r': -1, 'bb': 3, 'rr': -3, 'rb': 2, 'br': -2}
+    row_bonus = [0, 10, 20, 30, 40, 50, 60, 1000]
+    center_control_bonus = 5  # Bonus for controlling the center columns
+
+    for col in range(len(board)):
+        for row in range(len(board[col])):
+            spot = board[col][row]
+            if spot in piece_values:
+                score += piece_values[spot]
+                if player == 'b' and spot.startswith('b'):
+                    score += row_bonus[col]  # Row bonus for 'b'
+                elif player == 'r' and spot.startswith('r'):
+                    score -= row_bonus[7 - col]  # Row bonus for 'r' (counting from the opposite side)
+
+            # Center control bonus
+            if col in [3, 4]:  # Assuming a standard 8x8 board, columns 3 and 4 are central
+                if spot in ['b', 'bb', 'rb']:
+                    score += center_control_bonus
+                elif spot in ['r', 'rr', 'br']:
+                    score -= center_control_bonus
 
     return score
 

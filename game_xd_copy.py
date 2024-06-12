@@ -132,6 +132,7 @@ class AI:
 
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = None
         ordered_moves = self.order_moves(board, valid_moves, player)
 
         if maximizing_player:
@@ -166,6 +167,7 @@ class AI:
 
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = None
         ordered_moves = self.order_moves(board, valid_moves, player)
 
         if maximizing_player == 1:
@@ -225,6 +227,7 @@ class AI:
         
         valid_moves.pop(0)  # Remove the count
         best_move = None
+        ordered_moves = None
         ordered_moves = self.order_moves(board, valid_moves, player)
 
         max_eval = -math.inf

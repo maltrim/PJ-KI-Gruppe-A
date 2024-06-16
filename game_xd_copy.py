@@ -17,7 +17,7 @@ class AI:
         move_list.pop(0)
         return random.choice(move_list)
 
-    def determine_next_move_abs(self, max_depth, turn):
+    def determine_next_move(self, max_depth, turn):
         best_move = None
         best_score = -math.inf
         total_nodes_searched = 0

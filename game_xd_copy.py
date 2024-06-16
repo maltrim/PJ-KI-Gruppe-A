@@ -271,7 +271,7 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move, _ = current_player.determine_next_move_nm(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
+            next_move, _ = current_player.determine_next_move(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
             print(current_player.name)
             print(next_move)
             self.make_move(next_move)

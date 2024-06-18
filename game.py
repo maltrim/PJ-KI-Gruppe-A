@@ -118,7 +118,7 @@ class AI:
         return max_eval, best_move, nodes_searched
         
 
-    def alpha_beta_search_with_null_move(self, board, player, depth, alpha, beta, maximizing_player, start_time):
+    def alpha_beta_search_with_null_move(self, board, player, depth, alpha, beta, maximizing_player, start_time, null_move_allowed=True):
         nodes_searched = 1
 
         if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
@@ -131,19 +131,26 @@ class AI:
         valid_moves.pop(0)  # Remove the count
         ordered_moves = self.order_moves(board, valid_moves, player)
 
+        best_move = None
+
         # Null Move Pruning
-        if depth >= 3:  # Threshold for applying Null Move Pruning
-            new_depth = depth - 3  # Reduce depth for null move
-            null_move_score, _, _ = self.alpha_beta_search(board, switch_player(player), new_depth, -beta, -beta + 1, -maximizing_player, start_time)
+        if null_move_allowed and depth >= 3:
+            new_depth = depth - 2  # Reduce depth for null move
+            null_move_board = [row[:] for row in board]  # Clone the board
+            null_move_score, _, null_nodes = self.alpha_beta_search_with_null_move(
+                null_move_board, switch_player(player), new_depth, -beta, -beta + 1, -maximizing_player, start_time, null_move_allowed=False
+            )
             null_move_score = -null_move_score  # Invert score as it's opponent's turn
+            nodes_searched += null_nodes
 
             if null_move_score >= beta:
                 return beta, None, nodes_searched
 
-        max_eval = -math.inf
-        for move in ordered_moves:
+        if maximizing_player == 1:
+            max_eval = -math.inf
+            for move in ordered_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _ , nodes = self.alpha_beta_search(new_board, switch_player(player), depth - 1, beta , alpha, -maximizing_player, start_time)
+                eval, _, nodes = self.alpha_beta_search_with_null_move(new_board, switch_player(player), depth - 1, alpha, beta, -maximizing_player, start_time)
                 nodes_searched += nodes
                 if eval > max_eval:
                     max_eval = eval
@@ -151,7 +158,20 @@ class AI:
                 alpha = max(alpha, eval)
                 if alpha >= beta:
                     break  # alpha-beta cutoff
-        return max_eval, best_move, nodes_searched
+            return max_eval, best_move, nodes_searched
+        else:
+            min_eval = math.inf
+            for move in ordered_moves:
+                new_board = self.simulate_move(board, move)
+                eval, _, nodes = self.alpha_beta_search_with_null_move(new_board, switch_player(player), depth - 1, alpha, beta, -maximizing_player, start_time)
+                nodes_searched += nodes
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+                beta = min(beta, eval)
+                if alpha >= beta:
+                    break  # alpha-beta cutoff
+            return min_eval, best_move, nodes_searched
     
     def simulate_move(self, board, move):
         new_board = [row[:] for row in board]  # Create a copy of the board

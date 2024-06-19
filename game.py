@@ -30,10 +30,10 @@ class AI:
             depth_time_limit = remaining_time / (max_depth - depth + 1)
             self.time_limit = depth_time_limit
 
-            score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            #score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
-            #score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
             remaining_time -= duration
@@ -197,7 +197,7 @@ class AI:
             new_board = self.simulate_move(board, move)
             eval, _ , nodes = self.negaMax(new_board, switch_player(player), depth - 1, -maximizing_player, start_time)
             nodes_searched += nodes
-            eval = -eval  # Negate the evaluation after the recursion for NegaMax
+            eval = eval  # Negate the evaluation after the recursion for NegaMax
             if eval > max_eval:
                 max_eval = eval
                 best_move = move

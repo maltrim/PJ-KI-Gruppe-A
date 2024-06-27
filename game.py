@@ -34,6 +34,7 @@ class AI:
             #score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
             #score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            #score, move, nodes = self.negaMax_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
             remaining_time -= duration
@@ -202,6 +203,48 @@ class AI:
                 max_eval = eval
                 best_move = move
         return max_eval, best_move, nodes_searched
+    
+    def negaMax_with_null_move(self, board, player, depth, alpha, beta, maximizing_player, start_time, null_move_allowed=True):
+        nodes_searched = 1
+        
+        # Grundbedingungen für das Beenden der Rekursion
+        if time.time() - start_time >= self.time_limit or depth == 0 or game.is_game_over():
+            return evaluate_board(board, player) * maximizing_player, None, nodes_searched
+        
+        valid_moves = get_move_list(board, player)
+        if not valid_moves or len(valid_moves) == 1:
+            return evaluate_board(board, player), None, nodes_searched
+        
+        valid_moves.pop(0)  # Entferne die Anzahl der Züge aus der Liste
+        ordered_moves = self.order_moves(board, valid_moves, player)
+        
+        best_move = None
+        
+        # Nullzug-Suche
+        if null_move_allowed and depth >= 3:
+            new_depth = depth - 2  # Reduziere die Tiefe für den Nullzug
+            null_move_board = [row[:] for row in board]  # Klone das Brett
+            null_move_score, _, null_nodes = self.negaMax_with_null_move(
+                null_move_board, switch_player(player), new_depth, -beta, -beta + 1, -maximizing_player, start_time, null_move_allowed=False
+            )
+            null_move_score = -null_move_score  # Invertiere das Ergebnis, da es der Zug des Gegners ist
+            nodes_searched += null_nodes
+            
+            if null_move_score >= beta:
+                return beta, None, nodes_searched
+        
+        max_eval = -math.inf
+        for move in ordered_moves:
+            new_board = self.simulate_move(board, move)
+            eval, _, nodes = self.negaMax_with_null_move(new_board, switch_player(player), depth - 1, -beta, -alpha, -maximizing_player, start_time)
+            nodes_searched += nodes
+            if eval > max_eval:
+                max_eval = eval
+                best_move = move
+    
+        return max_eval, best_move, nodes_searched
+
+
 
 
 class Game:

@@ -149,7 +149,7 @@ class AI:
         max_eval = -math.inf
         for move in ordered_moves:
                 new_board = self.simulate_move(board, move)
-                eval, _, nodes = self.alpha_beta_search_with_null_move(new_board, switch_player(player), depth - 1, beta, alpha, -maximizing_player, start_time)
+                eval, _, nodes = self.alpha_beta_search_with_null_move(new_board, switch_player(player), depth - 1, -beta, -alpha, -maximizing_player, start_time)
                 nodes_searched += nodes
                 if eval > max_eval:
                     max_eval = eval
@@ -191,7 +191,7 @@ class AI:
         best_move = None
         ordered_moves = None
         ordered_moves = self.order_moves(board, valid_moves, player)
-
+        
         max_eval = -math.inf
         for move in ordered_moves:
             new_board = self.simulate_move(board, move)

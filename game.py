@@ -245,8 +245,6 @@ class AI:
         return max_eval, best_move, nodes_searched
 
 
-
-
 class Game:
     def __init__(self, p1, p2):
         self.board = generate_gameboard2()

@@ -30,10 +30,10 @@ class AI:
             depth_time_limit = remaining_time / (max_depth - depth + 1)
             self.time_limit = depth_time_limit
 
-            score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            #score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
-            #score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.negaMax_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time
@@ -139,7 +139,7 @@ class AI:
             new_depth = depth - 2  # Reduce depth for null move
             null_move_board = [row[:] for row in board]  # Clone the board
             null_move_score, _, null_nodes = self.alpha_beta_search_with_null_move(
-                null_move_board, switch_player(player), new_depth, -beta, -beta + 1, -maximizing_player, start_time, null_move_allowed=False
+                null_move_board, switch_player(player), new_depth, -beta + 1, -beta, -maximizing_player, start_time, null_move_allowed=False
             )
             null_move_score = -null_move_score  # Invert score as it's opponent's turn
             nodes_searched += null_nodes

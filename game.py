@@ -225,7 +225,7 @@ class AI:
             new_depth = depth - 2  # Reduziere die Tiefe für den Nullzug
             null_move_board = [row[:] for row in board]  # Klone das Brett
             null_move_score, _, null_nodes = self.negaMax_with_null_move(
-                null_move_board, switch_player(player), new_depth, -beta, -beta + 1, -maximizing_player, start_time, null_move_allowed=False
+                null_move_board, switch_player(player), new_depth, -beta + 1, -beta + 1, -maximizing_player, start_time, null_move_allowed=False
             )
             null_move_score = -null_move_score  # Invertiere das Ergebnis, da es der Zug des Gegners ist
             nodes_searched += null_nodes

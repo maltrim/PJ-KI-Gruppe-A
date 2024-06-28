@@ -375,7 +375,7 @@ def evaluate_board(board, player):
     
     # Define the importance of reaching the opponent's back rank
     back_rank_bonus = 100
-    one_back_before_bonus = 50
+    #one_back_before_bonus = 50
     capture_bonus = 10
     advance_bonus = 5  # Bonus for advancing forward
 
@@ -406,10 +406,10 @@ def evaluate_board(board, player):
             elif piece in ['r', 'rr', 'br'] and row == 0 and player == 'r':
                 score += back_rank_bonus
 
-            if piece in ['b', 'bb', 'rb'] and row == len(board) - 2 and player == 'b':
-                score += one_back_before_bonus
-            elif piece in ['r', 'rr', 'br'] and row == 1 and player == 'r':
-                score += one_back_before_bonus
+            #if piece in ['b', 'bb', 'rb'] and row == len(board) - 2 and player == 'b':
+                #score += one_back_before_bonus
+            #elif piece in ['r', 'rr', 'br'] and row == 1 and player == 'r':
+                #score += one_back_before_bonus
 
     for row in range(len(board)):
         for col in range(len(board[row])):

@@ -379,6 +379,10 @@ def evaluate_board(board, player):
     capture_bonus = 10
     advance_bonus = 5  # Bonus for advancing forward
 
+    # Defensive bonuses
+    block_bonus = 10
+    threat_penalty = -10
+
     # Loop through the board to evaluate the positions
     for row in range(len(board)):
         for col in range(len(board[row])):
@@ -424,6 +428,18 @@ def evaluate_board(board, player):
                 if (row < len(board) - 2 and col > 1 and board[row+1][col-1] in ['b', 'bb', 'rb'] and board[row+2][col-2] == 'e') or \
                    (row < len(board) - 2 and col < len(board[row]) - 2 and board[row+1][col+1] in ['b', 'bb', 'rb'] and board[row+2][col+2] == 'e'):
                     score += capture_bonus
+    
+    # Apply block bonuses for defending own rows
+    if player == 'b' and row <= 1 and piece in ['b', 'bb', 'rb']:
+        score += block_bonus
+    elif player == 'r' and row >= 6 and piece in ['r', 'rr', 'br']:
+        score += block_bonus
+
+    # Apply threat penalties for opponent pieces near own base
+    if player == 'b' and row >= 6 and piece in ['r', 'rr', 'br']:
+        score += threat_penalty
+    elif player == 'r' and row <= 1 and piece in ['b', 'bb', 'rb']:
+        score += threat_penalty
     
 
     # Heuristic weights

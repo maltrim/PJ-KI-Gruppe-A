@@ -353,4 +353,4 @@ class Game:
 blue = AI('b')
 red = AI('r')
 game = Game(blue, red)
-#game.play()
+game.play()

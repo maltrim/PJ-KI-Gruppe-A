@@ -22,7 +22,7 @@ def benchmark(fen_str, max_depth, turn):
 def main():
     positions = [fen_str_start, fen_str_mid, fen_str_end]
     turns = ['b', 'r', 'b']  # Specify the turn for each FEN string
-    depths = [2, 3, 4]
+    depths = [2, 3, 4] # Decide the amount of Depths
     
     for fen_str, turn in zip(positions, turns):
         print(f"Testing FEN: {fen_str}")

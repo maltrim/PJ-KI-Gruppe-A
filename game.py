@@ -31,9 +31,9 @@ class AI:
             self.time_limit = depth_time_limit
 
             #score, move, nodes = self.alpha_beta_search(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
-            score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
+            #score, move, nodes = self.negaMax(game.board, turn, depth, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.minimax_search(game.board, turn, depth, self.turnB, total_start_time)
-            #score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
+            score, move, nodes = self.alpha_beta_search_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             #score, move, nodes = self.negaMax_with_null_move(game.board, turn, depth, -math.inf, math.inf, 1 if self.turnB else -1, total_start_time)
             total_nodes_searched += nodes
             duration = time.time() - start_time

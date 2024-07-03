@@ -11,7 +11,7 @@ def benchmark(fen_str, max_depth, turn):
     objR = AI('r')
     objGame = Game(objB, objR)
     objGame.board = generate_gameboard(fen_str)
-    objB.time_limit = 10  # Increase the time limit for better depth search
+    #objB.time_limit = 10  # Increase the time limit for better depth search
 
     start_time = time.time()
     move, nodes_searched = objB.determine_next_move(max_depth, turn)

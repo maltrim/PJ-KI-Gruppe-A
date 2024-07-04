@@ -204,7 +204,7 @@ class AI:
                 best_move = move
         return max_eval, best_move, nodes_searched
     
-    def negaMax_with_null_move(self, board, player, depth, alpha, beta, maximizing_player, start_time, null_move_allowed=True):
+    def negaMaxAlphaBeta_with_null_move(self, board, player, depth, alpha, beta, maximizing_player, start_time, null_move_allowed=True):
         nodes_searched = 1
         
         # Grundbedingungen für das Beenden der Rekursion
@@ -240,6 +240,9 @@ class AI:
             if eval > max_eval:
                 max_eval = eval
                 best_move = move
+            alpha = max(alpha, eval)
+            if alpha >= beta:
+                break  # alpha-beta cutoff
     
         return max_eval, best_move, nodes_searched
 

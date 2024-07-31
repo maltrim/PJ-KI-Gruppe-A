@@ -309,9 +309,6 @@ class AI_MCTS:
 
     def __init__(self, name):
         self.name = name  # Farbe
-        self.movelist = []
-        self.time_limit = 2.0  # Zeitlimit für die Suche in Sekunden
-        self.initial_time_limit = 5.0  # Ein initiales Zeitlimit für die gesamte Berechnung
 
     def mcts_search(self, board, player, iterations):
         root = Node(board, player, None)

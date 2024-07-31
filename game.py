@@ -1,7 +1,65 @@
 import math
 import random
 import time
-from main import generate_gameboard2, get_move_list, switch_char2, switch_player, make_move, evaluate_board
+import numpy as np
+from main import generate_gameboard2, get_move_list, switch_char2, switch_player, make_move, evaluate_board, is_game_over_MCTS
+
+class Node:
+    def __init__(self, board, player, move, parent=None):
+        self.board = board
+        self.player = player
+        self.move = move
+        self.parent = parent  # Hinzugefügt
+        self.visits = 0
+        self.wins = 0
+        self.children = []
+        x = get_move_list(board, player)
+        x.pop(0)
+        self.untried_moves = x
+
+    def expand(self):
+        move = self.untried_moves.pop()
+        new_board = make_move([row[:] for row in self.board], move)
+        child_node = Node(new_board, switch_player(self.player), move, self)  # Übergabe von self als parent
+        self.children.append(child_node)
+        return child_node
+
+    def backpropagate(self, result):
+        self.visits += 1
+        if self.player == result:
+            self.wins += 1
+        if self.parent:  # Dieser Check ist jetzt sinnvoll, da `parent` initialisiert wird
+            self.parent.backpropagate(result)
+
+    def is_fully_expanded(self):
+        return len(self.untried_moves) == 0
+
+    def best_child(self, c_param=1.414):
+        choices_weights = [
+            (child.wins / child.visits) + c_param * np.sqrt((2 * np.log(self.visits) / child.visits))
+            for child in self.children
+        ]
+        return self.children[np.argmax(choices_weights)]
+
+    def simulate(self):
+        board_copy = [row[:] for row in self.board]
+        sim_player = self.player
+        while True:
+            if is_game_over_MCTS(board_copy):
+                return evaluate_board(board_copy, sim_player)
+            move_list = get_move_list(board_copy, sim_player)
+            move_list.pop(0)
+            move = random.choice(move_list)
+            board_copy = make_move(board_copy, move)
+            sim_player = switch_player(sim_player)
+
+
+    def best_move(self):
+        sorted_children = sorted(self.children, key=lambda x: x.visits, reverse=True)
+        return sorted_children[0].move if sorted_children else None
+
+    def is_terminal(self):
+        return is_game_over_MCTS(self.board)
 
 class AI:
     turnB = True
@@ -43,7 +101,7 @@ class AI:
                 best_score = score
                 best_move = move
 
-            print(f"Depth: {depth}, Best Score: {best_score}, Best Move: {best_move}, Nodes Searched: {total_nodes_searched}, Time: {duration}s")
+            #print(f"Depth: {depth}, Best Score: {best_score}, Best Move: {best_move}, Nodes Searched: {total_nodes_searched}, Time: {duration}s")
 
             if remaining_time <= 0:
                 break
@@ -246,6 +304,35 @@ class AI:
     
         return max_eval, best_move, nodes_searched
 
+class AI_MCTS:
+    turnB = True
+
+    def __init__(self, name):
+        self.name = name  # Farbe
+        self.movelist = []
+        self.time_limit = 2.0  # Zeitlimit für die Suche in Sekunden
+        self.initial_time_limit = 5.0  # Ein initiales Zeitlimit für die gesamte Berechnung
+
+    def mcts_search(self, board, player, iterations):
+        root = Node(board, player, None)
+
+        for _ in range(iterations):
+            node = root
+            # 1. Selection
+            while node.is_fully_expanded() and not node.is_terminal():
+                node = node.best_child()
+
+            # 2. Expansion
+            if not node.is_fully_expanded():
+                node = node.expand()
+
+            # 3. Simulation
+            outcome = node.simulate()
+
+            # 4. Backpropagation
+            node.backpropagate(outcome)
+
+        return root.best_move()
 
 class Game:
     def __init__(self, p1, p2):
@@ -343,16 +430,21 @@ class Game:
     def play(self):
         while not self.is_game_over():
             current_player = self.players[self.current_player_index]
-            next_move, _ = current_player.determine_next_move(4, current_player.name)  # hier minimax, alpha beta oder random auswählen
-            print(current_player.name)
-            print(next_move)
+            # MCTS mit 100 Iterationen verwenden
+            if current_player.name == 'b':
+                next_move = current_player.mcts_search(self.board, current_player.name, 1000)
+            else:
+                next_move, _ = current_player.determine_next_move(4, current_player.name)
+            print(f"{current_player.name}: {next_move}")
             self.make_move(next_move)
             if next_move is None:
                 break
             self.current_player_index = (self.current_player_index + 1) % 2
             print(self.board)
 
-blue = AI('b')
+
+blue = AI_MCTS('b')
 red = AI('r')
 game = Game(blue, red)
 #game.play()
+

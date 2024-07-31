@@ -19,4 +19,4 @@ Die Spieler (die AI's) werden initialisiert und deklariert mit der Zuweisung rot
 `blue = AI('b')`
 `red = AI('r')`
 `game = Game(blue, red)`
-`game.play()`
+`game.play()` Momentan auskommentiert, aufgrund der Benchmarks. Bitte # entfernen, um MCTS vs. Alpha-Beta spielen zu lassen.

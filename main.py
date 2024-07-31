@@ -477,3 +477,30 @@ def count_pieces(board, turn):
 
 def switch_player(player):
     return 'b' if player == 'r' else 'r'
+
+def is_game_over_MCTS(gameboard):
+    players_info = {
+        'r': {'opponents': ['b', 'rb', 'bb'], 'own_row': 7},
+        'b': {'opponents': ['r', 'br', 'rr'], 'own_row': 0}
+    }
+
+    for player, info in players_info.items():
+        # Überprüfung, ob keine Figuren der Gegner übrig sind
+        for opp in info['opponents']:
+            if not any(opp in row for row in gameboard):
+                #print(f'Game over, no figures left for {player}!')
+                return True
+
+            # Überprüfung, ob die Gegner keine gültigen Züge mehr haben
+            if not any(get_move_list(gameboard, opp)):
+                #(f'Game over, no available moves left for {player}!')
+                return True
+
+            # Überprüfung, ob die Gegner die letzte Reihe erreicht haben
+            if gameboard[info['own_row']].count(opp) > 0:
+                #print(f'Game over, {opp} reached the end row for {player}!')
+                return True
+
+    return False
+
+
